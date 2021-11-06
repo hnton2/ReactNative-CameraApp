@@ -8,12 +8,28 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-navigation/native": "^6.0.6",
+    "@react-navigation/native-stack": "^6.2.5",
+    "@unimodules/react-native-adapter": "^6.3.9",
+    "buffer": "^6.0.3",
     "expo": "~43.0.0",
+    "expo-asset": "~8.4.3",
+    "expo-camera": "~12.0.3",
+    "expo-file-system": "~13.0.3",
+    "expo-media-library": "~13.0.3",
     "expo-status-bar": "~1.1.0",
+    "gl-react": "^4.1.0",
+    "gl-react-expo": "^5.0.0",
+    "gl-react-image": "^3.2.0",
     "react": "17.0.1",
     "react-dom": "17.0.1",
     "react-native": "0.64.2",
-    "react-native-web": "0.17.1"
+    "react-native-safe-area-context": "^3.3.2",
+    "react-native-screens": "^3.9.0",
+    "react-native-vector-icons": "^9.0.0",
+    "react-native-web": "0.17.1",
+    "webgltexture-loader-expo-camera": "^1.0.0",
+    "expo-image-manipulator": "~10.1.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
