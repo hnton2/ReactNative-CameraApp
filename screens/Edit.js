@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView, ActivityIndicator } from "react-native";
-import { Surface } from "gl-react-expo";
-import Temperature from "../filters/Temperature";
-import Hue from "../filters/Hue";
-import Saturate from "../filters/Saturation";
-import "webgltexture-loader-expo-camera";
 import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Icon from "react-native-vector-icons/Ionicons";
+import FilterList from "./FilterList";
+import EffectList from "./EffectList";
 
 const renderTopBar = (navigation) => (
     <View style={styles.topBar}>
@@ -21,87 +18,51 @@ const renderTopBar = (navigation) => (
     </View>
 );
 
-const renderBottomBar = () => {
-    const [selectedIndex, setSelectedIndex] = useState(1);
-    const handleTab = (val) => {
-        setSelectedIndex(val);
+const renderBottomBar = ({ texture, changePhoto }) => {
+    const [showFilter, setShowFilter] = useState(false);
+    const [showEffect, setShowEffect] = useState(false);
+    const [showCrop, setShowCrop] = useState(false);
+
+    const handleShowFilter = () => {
+        setShowFilter(!showFilter);
+        setShowCrop(false);
+        setShowEffect(false);
     };
+    const handleShowEffect = () => {
+        setShowEffect(!showEffect);
+        setShowFilter(false);
+        setShowCrop(false);
+    };
+    const handleShowCrop = () => {
+        setShowCrop(!showCrop);
+        setShowFilter(false);
+        setShowEffect(false);
+    };
+
     return (
         <View style={styles.bottomBar}>
-            {/* <View style={styles.tabView}>
-                {selectedIndex === 1 ? (
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        <Image
-                            source={{
-                                uri: "https://github.com/iyegoroff/react-native-color-matrix-image-filters/raw/master/img/parrot.png",
-                            }}
-                            style={{ width: 80, height: 80 }}
-                        />
-                        <Image
-                            source={{
-                                uri: "https://github.com/iyegoroff/react-native-color-matrix-image-filters/raw/master/img/gray.png",
-                            }}
-                            style={{ width: 80, height: 80 }}
-                        />
-                        <Image
-                            source={{
-                                uri: "https://github.com/iyegoroff/react-native-color-matrix-image-filters/raw/master/img/parrot.png",
-                            }}
-                            style={{ width: 80, height: 80 }}
-                        />
-                        <Image
-                            source={{
-                                uri: "https://github.com/iyegoroff/react-native-color-matrix-image-filters/raw/master/img/gray.png",
-                            }}
-                            style={{ width: 80, height: 80 }}
-                        />
-                        <Image
-                            source={{
-                                uri: "https://github.com/iyegoroff/react-native-color-matrix-image-filters/raw/master/img/parrot.png",
-                            }}
-                            style={{ width: 80, height: 80 }}
-                        />
-                        <Image
-                            source={{
-                                uri: "https://github.com/iyegoroff/react-native-color-matrix-image-filters/raw/master/img/parrot.png",
-                            }}
-                            style={{ width: 80, height: 80 }}
-                        />
-                    </ScrollView>
-                ) : (
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                        <Image
-                            source={{
-                                uri: "https://github.com/iyegoroff/react-native-color-matrix-image-filters/raw/master/img/parrot.png",
-                            }}
-                            style={{ width: 80, height: 80 }}
-                        />
-                    </ScrollView>
-                )}
-            </View> */}
+            <View style={styles.tabView}>
+                {showFilter && <FilterList texture={texture} changePhoto={changePhoto} />}
+                {showEffect && <EffectList texture={texture} changePhoto={changePhoto} />}
+            </View>
 
             <View style={styles.tab}>
-                <TouchableOpacity style={styles.bottomButton} onPress={() => handleTab(1)}>
-                    <Icon name="color-filter-outline" color={selectedIndex === 1 ? "white" : "#858585"} size={25} />
-                    <Text style={selectedIndex === 1 ? styles.tabTitleActive : styles.tabTitle}>Filter</Text>
+                <TouchableOpacity style={styles.bottomButton} onPress={handleShowFilter}>
+                    <Icon name="color-filter-outline" color={showFilter ? "white" : "#858585"} size={25} />
+                    <Text style={showFilter ? styles.tabTitleActive : styles.tabTitle}>Filter</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton} onPress={() => handleTab(2)}>
+                <TouchableOpacity style={styles.bottomButton} onPress={handleShowEffect}>
                     <MaterialIcons
                         name="auto-fix-high"
-                        color={selectedIndex === 2 ? "white" : "#858585"}
+                        color={showEffect ? "white" : "#858585"}
                         type="material"
                         size={25}
                     />
-                    <Text style={selectedIndex === 2 ? styles.tabTitleActive : styles.tabTitle}>Effect</Text>
+                    <Text style={showEffect ? styles.tabTitleActive : styles.tabTitle}>Effect</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton} onPress={() => handleTab(3)}>
-                    <MaterialIcons
-                        name="crop"
-                        color={selectedIndex === 3 ? "white" : "#858585"}
-                        type="material"
-                        size={25}
-                    />
-                    <Text style={selectedIndex === 3 ? styles.tabTitleActive : styles.tabTitle}>Crop</Text>
+                <TouchableOpacity style={styles.bottomButton} onPress={handleShowCrop}>
+                    <MaterialIcons name="crop" color={showCrop ? "white" : "#858585"} type="material" size={25} />
+                    <Text style={showCrop ? styles.tabTitleActive : styles.tabTitle}>Crop</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -129,25 +90,23 @@ function EditScreen({ route, navigation }) {
         loadAsync();
     }, []);
 
+    const changePhoto = (photo) => {
+        setTexture(photo);
+    };
+
     return (
         <View style={styles.container}>
             {renderTopBar(navigation)}
             <View style={styles.main}>
                 {texture ? (
-                    <Surface style={{ width: texture.width, height: texture.height }}>
-                        <Saturate contrast={1} saturation={1} brightness={1}>
-                            {{
-                                uri: texture.uri,
-                            }}
-                        </Saturate>
-                    </Surface>
+                    <Image source={{ uri: texture.uri }} style={{ width: texture.width, height: texture.height }} />
                 ) : (
                     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
                         <ActivityIndicator size="large" color="#fff" />
                     </View>
                 )}
             </View>
-            {renderBottomBar()}
+            {renderBottomBar({ texture: texture, changePhoto: changePhoto })}
         </View>
     );
 }
