@@ -5,6 +5,7 @@ import { Camera } from "expo-camera";
 import { AutoFocus, CameraType, FlashMode, WhiteBalance } from "expo-camera/build/Camera.types";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import * as FaceDetector from "expo-face-detector";
 
 const wbOrder = {
     auto: "sunny",
@@ -32,8 +33,6 @@ export default function CameraScreen({ navigation }) {
         type: CameraType.back,
         depth: 0,
         whiteBalance: "auto",
-        faceDetecting: false,
-        faces: [],
         permissionsGranted: false,
         pictureSizes: [],
         pictureSizeId: 0,
@@ -41,6 +40,8 @@ export default function CameraScreen({ navigation }) {
     });
     const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off);
     const [newPhoto, setNewPhoto] = useState(false);
+    const [faceDetecting, setFaceDetecting] = useState(false);
+    const [faces, setFaces] = useState([]);
 
     // Request Camera Permission
     useEffect(() => {
@@ -82,9 +83,8 @@ export default function CameraScreen({ navigation }) {
 
     const setFocusDepth = (depth) => setCameraProps({ ...prevState, depth });
 
-    const toggleFaceDetection = () =>
-        setCameraProps((prevState) => ({ ...prevState, faceDetecting: !prevState.faceDetecting }));
-
+    const toggleFaceDetection = () => setFaceDetecting(!faceDetecting);
+    console.log(faceDetecting);
     function useMediaLibraryPermissions() {
         const [permissions, setPermissions] = React.useState();
 
@@ -121,17 +121,78 @@ export default function CameraScreen({ navigation }) {
 
     const handleMountError = ({ message }) => console.error(message);
 
-    const onFacesDetected = ({ faces }) => setCameraProps({ ...cameraProps, faces });
+    const handleOnFacesDetected = ({ faces }) => {
+        console.log("hello");
+        console.log(faces);
+        setFaces(faces);
+    };
+    console.log(faces);
+    function renderFace({ bounds, faceID, rollAngle, yawAngle, smilingProbability, leftEarPosition }) {
+        return (
+            <View
+                key={faceID}
+                transform={[
+                    { perspective: 600 },
+                    { rotateZ: `${rollAngle.toFixed(0)}deg` },
+                    { rotateY: `${yawAngle.toFixed(0)}deg` },
+                ]}
+                style={[
+                    styles.face,
+                    {
+                        ...bounds.size,
+                        left: bounds.origin.x,
+                        top: bounds.origin.y,
+                    },
+                ]}
+            >
+                <Text style={styles.faceText}>ID: {faceID}</Text>
+                <Text style={styles.faceText}>rollAngle: {rollAngle.toFixed(0)}</Text>
+                <Text style={styles.faceText}>yawAngle: {yawAngle}</Text>
+                <Text style={styles.faceText}>leftEarPosition: {leftEarPosition}</Text>
+                <Text style={styles.faceText}>smilingProbability: {smilingProbability}</Text>
+            </View>
+        );
+    }
+
+    function renderLandmarksOfFace(face) {
+        const renderLandmark = (position) =>
+            position && (
+                <View
+                    style={[
+                        styles.landmark,
+                        {
+                            left: position.x - landmarkSize / 2,
+                            top: position.y - landmarkSize / 2,
+                        },
+                    ]}
+                />
+            );
+        return (
+            <View key={`landmarks-${face.faceID}`}>
+                {renderLandmark(face.leftEyePosition)}
+                {renderLandmark(face.rightEyePosition)}
+                {renderLandmark(face.leftEarPosition)}
+                {renderLandmark(face.rightEarPosition)}
+                {renderLandmark(face.leftCheekPosition)}
+                {renderLandmark(face.rightCheekPosition)}
+                {renderLandmark(face.leftMouthPosition)}
+                {renderLandmark(face.mouthPosition)}
+                {renderLandmark(face.rightMouthPosition)}
+                {renderLandmark(face.noseBasePosition)}
+                {renderLandmark(face.bottomMouthPosition)}
+            </View>
+        );
+    }
 
     const renderFaces = () => (
         <View style={styles.facesContainer} pointerEvents="none">
-            {cameraProps.faces.map(face)}
+            {faces.map(renderFace)}
         </View>
     );
 
     const renderLandmarks = () => (
         <View style={styles.facesContainer} pointerEvents="none">
-            {cameraProps.faces.map(landmarks)}
+            {faces.map(renderLandmarksOfFace)}
         </View>
     );
 
@@ -198,7 +259,7 @@ export default function CameraScreen({ navigation }) {
                 <TouchableOpacity onPress={toggleFaceDetection}>
                     <MaterialIcons
                         name="tag-faces"
-                        color={cameraProps.faceDetecting ? "white" : "#858585"}
+                        color={faceDetecting ? "white" : "#858585"}
                         type="material"
                         size={32}
                     />
@@ -237,16 +298,16 @@ export default function CameraScreen({ navigation }) {
                 whiteBalance={cameraProps.whiteBalance}
                 pictureSize={cameraProps.pictureSize}
                 onMountError={handleMountError}
-                // onFacesDetected={cameraProps.faceDetecting ? onFacesDetected : undefined}
-                // faceDetectorSettings={{
-                //     tracking: true,
-                // }}
+                onFacesDetected={faceDetecting ? handleOnFacesDetected : undefined}
+                faceDetectorSettings={{
+                    tracking: true,
+                }}
             >
                 {renderTopBar()}
                 {renderBottomBar()}
             </Camera>
-            {cameraProps.faceDetecting && renderFaces()}
-            {cameraProps.faceDetecting && renderLandmarks()}
+            {faceDetecting && renderFaces()}
+            {faceDetecting && renderLandmarks()}
             {cameraProps.showMoreOptions && renderMoreOptions()}
         </View>
     );
@@ -363,5 +424,34 @@ const styles = StyleSheet.create({
     },
     row: {
         flexDirection: "row",
+    },
+    facesContainer: {
+        position: "absolute",
+        bottom: 0,
+        right: 0,
+        left: 0,
+        top: 0,
+    },
+    face: {
+        padding: 10,
+        borderWidth: 2,
+        borderRadius: 2,
+        position: "absolute",
+        borderColor: "#FFD700",
+        justifyContent: "center",
+        backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    landmark: {
+        width: 2,
+        height: 2,
+        position: "absolute",
+        backgroundColor: "red",
+    },
+    faceText: {
+        color: "#FFD700",
+        fontWeight: "bold",
+        textAlign: "center",
+        margin: 10,
+        backgroundColor: "transparent",
     },
 });

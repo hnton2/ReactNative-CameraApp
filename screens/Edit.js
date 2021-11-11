@@ -6,6 +6,9 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Icon from "react-native-vector-icons/Ionicons";
 import FilterList from "./FilterList";
 import EffectList from "./EffectList";
+import Normal from "../filters/Normal";
+import { Surface } from "gl-react-expo";
+import "webgltexture-loader-expo-camera";
 
 const renderTopBar = (navigation) => (
     <View style={styles.topBar}>
