@@ -5,14 +5,6 @@ import "webgltexture-loader-expo-camera";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Slider from "@react-native-community/slider";
 
-import Temperature from "../filters/Temperature";
-import Hue from "../filters/Hue";
-import ContrastSaturationBrightness from "../filters/ContrastSaturationBrightness";
-import Negative from "../filters/Negative";
-// import Sepia from "../filters/Sepia";
-import Sharpen from "../filters/Sharpen";
-import Saturate from "../filters/Saturate";
-
 function EffectList({ texture, changePhoto }) {
     const [effect, setEffect] = useState(null);
 

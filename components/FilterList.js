@@ -43,91 +43,91 @@ function FilterButton({ component, name, uri, changeFilter, factor = 1 }) {
     );
 }
 
-function FilterList({ texture, changePhoto }) {
+function FilterList({ texture, changeFilter }) {
     const handleChangeFilter = (type) => {
-        changePhoto(type);
+        changeFilter(type);
     };
 
     return (
         <ScrollView style={{ padding: 5 }} horizontal showsHorizontalScrollIndicator={false}>
-            <FilterButton component={Amaro} name={filterType.Amaro} uri={texture.uri} changeFilter={changePhoto} />
-            <FilterButton component={Brannan} name={filterType.Brannan} uri={texture.uri} changeFilter={changePhoto} />
+            <FilterButton component={Amaro} name={filterType.Amaro} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Brannan} name={filterType.Brannan} uri={texture.uri} changeFilter={changeFilter} />
             <FilterButton
                 component={Earlybird}
                 name={filterType.Earlybird}
                 uri={texture.uri}
-                changeFilter={changePhoto}
+                changeFilter={changeFilter}
             />
-            <FilterButton component={F1977} name={filterType.F1977} uri={texture.uri} changeFilter={changePhoto} />
-            <FilterButton component={Hefe} name={filterType.Hefe} uri={texture.uri} changeFilter={changePhoto} />
-            <FilterButton component={Hudson} name={filterType.Hudson} uri={texture.uri} changeFilter={changePhoto} />
-            <FilterButton component={Inkwell} name={filterType.Inkwell} uri={texture.uri} changeFilter={changePhoto} />
-            <FilterButton component={Lokofi} name={filterType.Lokofi} uri={texture.uri} changeFilter={changePhoto} />
+            <FilterButton component={F1977} name={filterType.F1977} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Hefe} name={filterType.Hefe} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Hudson} name={filterType.Hudson} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Inkwell} name={filterType.Inkwell} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Lokofi} name={filterType.Lokofi} uri={texture.uri} changeFilter={changeFilter} />
             <FilterButton
                 component={LordKelvin}
                 name={filterType.LordKelvin}
                 uri={texture.uri}
-                changeFilter={changePhoto}
+                changeFilter={changeFilter}
             />
             <FilterButton
                 component={Nashville}
                 name={filterType.Nashville}
                 uri={texture.uri}
-                changeFilter={changePhoto}
+                changeFilter={changeFilter}
             />
-            <FilterButton component={Normal} name={filterType.Normal} uri={texture.uri} changeFilter={changePhoto} />
-            <FilterButton component={Rise} name={filterType.Rise} uri={texture.uri} changeFilter={changePhoto} />
-            <FilterButton component={Sierra} name={filterType.Sierra} uri={texture.uri} changeFilter={changePhoto} />
-            <FilterButton component={Sutro} name={filterType.Sutro} uri={texture.uri} changeFilter={changePhoto} />
-            <FilterButton component={Toaster} name={filterType.Toaster} uri={texture.uri} changeFilter={changePhoto} />
+            <FilterButton component={Normal} name={filterType.Normal} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Rise} name={filterType.Rise} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Sierra} name={filterType.Sierra} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Sutro} name={filterType.Sutro} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Toaster} name={filterType.Toaster} uri={texture.uri} changeFilter={changeFilter} />
             <FilterButton
                 component={Valencia}
                 name={filterType.Valencia}
                 uri={texture.uri}
-                changeFilter={changePhoto}
+                changeFilter={changeFilter}
             />
-            <FilterButton component={Walden} name={filterType.Walden} uri={texture.uri} changeFilter={changePhoto} />
-            <FilterButton component={XproII} name={filterType.XproII} uri={texture.uri} changeFilter={changePhoto} />
+            <FilterButton component={Walden} name={filterType.Walden} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={XproII} name={filterType.XproII} uri={texture.uri} changeFilter={changeFilter} />
             <FilterButton
                 component={Temperature}
                 name={filterType.Temperature}
                 uri={texture.uri}
-                changeFilter={changePhoto}
+                changeFilter={changeFilter}
                 factor={6300}
             />
             <FilterButton
                 component={Hue}
                 name={filterType.Hue}
                 uri={texture.uri}
-                changeFilter={changePhoto}
+                changeFilter={changeFilter}
                 factor={2}
             />
             <FilterButton
                 component={Negative}
                 name={filterType.Negative}
                 uri={texture.uri}
-                changeFilter={changePhoto}
+                changeFilter={changeFilter}
                 factor={0.25}
             />
             <FilterButton
                 component={Sharpen}
                 name={filterType.Sharpen}
                 uri={texture.uri}
-                changeFilter={changePhoto}
+                changeFilter={changeFilter}
                 factor={0.25}
             />
             <FilterButton
                 component={Saturate}
                 name={filterType.Saturate}
                 uri={texture.uri}
-                changeFilter={changePhoto}
+                changeFilter={changeFilter}
                 factor={2}
             />
             <FilterButton
                 component={Sepia}
                 name={filterType.Sepia}
                 uri={texture.uri}
-                changeFilter={changePhoto}
+                changeFilter={changeFilter}
                 factor={1.5}
             />
         </ScrollView>

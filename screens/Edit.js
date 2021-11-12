@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView, ActivityIndicator } from "react-native";
 import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
@@ -36,19 +36,20 @@ import Valencia from "../filters/Valencia";
 import Walden from "../filters/Walden";
 import XproII from "../filters/XproII";
 import FilterComponent from "../components/Filter";
+import { saveImageToAlbum } from "../helpers/Library";
 
-const renderTopBar = (navigation) => (
+const renderTopBar = ({ navigation, saveImage }) => (
     <View style={styles.topBar}>
         <TouchableOpacity style={styles.toggleButton} onPress={() => navigation.goBack()}>
             <Text style={styles.whiteText}>Cancel</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.toggleButton} onPress={() => {}}>
+        <TouchableOpacity style={styles.toggleButton} onPress={saveImage}>
             <Text style={styles.whiteText}>Save</Text>
         </TouchableOpacity>
     </View>
 );
 
-const renderBottomBar = ({ texture, changePhoto }) => {
+const renderBottomBar = ({ texture, changeFilter }) => {
     const [showFilter, setShowFilter] = useState(false);
     const [showEffect, setShowEffect] = useState(false);
     const [showCrop, setShowCrop] = useState(false);
@@ -72,8 +73,8 @@ const renderBottomBar = ({ texture, changePhoto }) => {
     return (
         <View style={styles.bottomBar}>
             <View style={styles.tabView}>
-                {showFilter && <FilterList texture={texture} changePhoto={changePhoto} />}
-                {showEffect && <EffectList texture={texture} changePhoto={changePhoto} />}
+                {showFilter && <FilterList texture={texture} changeFilter={changeFilter} />}
+                {showEffect && <EffectList texture={texture} changeFilter={changeFilter} />}
             </View>
 
             <View style={styles.tab}>
@@ -121,16 +122,28 @@ function EditScreen({ route, navigation }) {
         loadAsync();
     }, []);
 
-    const changePhoto = (filterStr) => {
+    const changeFilter = (filterStr) => {
         setFilter(filterStr);
+    };
+
+    let captureImage;
+
+    const saveImage = async () => {
+        if (!captureImage) return;
+
+        const result = await captureImage.glView.capture();
+        saveImageToAlbum(result);
     };
 
     return (
         <View style={styles.container}>
-            {renderTopBar(navigation)}
+            {renderTopBar({ navigation, saveImage })}
             <View style={styles.main}>
                 {texture ? (
-                    <Surface style={{ width: texture.width, height: texture.height }}>
+                    <Surface
+                        style={{ width: texture.width, height: texture.height }}
+                        ref={(ref) => (captureImage = ref)}
+                    >
                         {filter === filterType.Amaro && <FilterComponent component={Amaro} photoUri={texture.uri} />}
                         {filter === filterType.Brannan && (
                             <FilterComponent component={Brannan} photoUri={texture.uri} />
@@ -188,7 +201,7 @@ function EditScreen({ route, navigation }) {
                     </View>
                 )}
             </View>
-            {renderBottomBar({ texture: texture, changePhoto: changePhoto })}
+            {renderBottomBar({ texture: texture, changeFilter: changeFilter })}
         </View>
     );
 }

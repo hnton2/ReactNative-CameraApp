@@ -6,6 +6,7 @@ import { AutoFocus, CameraType, FlashMode, WhiteBalance } from "expo-camera/buil
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import * as FaceDetector from "expo-face-detector";
+import { saveImage } from "../helpers/Library";
 
 const wbOrder = {
     auto: "sunny",
@@ -107,14 +108,7 @@ export default function CameraScreen({ navigation }) {
             const photo = await camera.takePictureAsync();
             //add to album
             if (!permission) return null;
-
-            const asset = await MediaLibrary.createAssetAsync(photo.uri);
-            const myAlbum = await MediaLibrary.getAlbumAsync(ALBUM_NAME);
-            if (myAlbum) {
-                await MediaLibrary.addAssetsToAlbumAsync(asset, myAlbum);
-            } else {
-                await MediaLibrary.createAlbumAsync(ALBUM_NAME, asset);
-            }
+            saveImageToAlbum(photo);
             setNewPhoto(true);
         }
     };
