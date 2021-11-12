@@ -1,8 +1,6 @@
-import React from "react";
+import { GLSL, Node, Shaders } from "gl-react";
 import PropTypes from "prop-types";
-
-import { GLSL, Shaders, Node } from "gl-react";
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import React from "react";
 
 const shaders = Shaders.create({
     Earlybird: {
@@ -85,19 +83,21 @@ const shaders = Shaders.create({
     },
 });
 
-const Earlybird = ({ children: t }) => (
-    <Node
-        shader={shaders.Earlybird}
-        uniforms={{
-            inputImageTexture: t,
-            inputImageTexture2: require("../resources/earlyBirdCurves.png"),
-            inputImageTexture3: require("../resources/earlybirdOverlayMap.png"),
-            inputImageTexture4: require("../resources/vignetteMap.png"),
-            inputImageTexture5: require("../resources/earlybirdBlowout.png"),
-            inputImageTexture6: require("../resources/earlybirdMap.png"),
-        }}
-    />
-);
+const Earlybird = ({ children: t }) => {
+    return (
+        <Node
+            shader={shaders.Earlybird}
+            uniforms={{
+                inputImageTexture: t,
+                inputImageTexture2: require("../resources/earlyBirdCurves.png"),
+                inputImageTexture3: require("../resources/earlybirdOverlayMap.png"),
+                inputImageTexture4: require("../resources/vignetteMap.png"),
+                inputImageTexture5: require("../resources/earlybirdBlowout.png"),
+                inputImageTexture6: require("../resources/earlybirdMap.png"),
+            }}
+        />
+    );
+};
 
 Earlybird.propTypes = {
     children: PropTypes.object.isRequired,

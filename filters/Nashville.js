@@ -1,8 +1,6 @@
-import React from "react";
+import { GLSL, Node, Shaders } from "gl-react";
 import PropTypes from "prop-types";
-
-import { GLSL, Shaders, Node } from "gl-react";
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import React from "react";
 
 const shaders = Shaders.create({
     Nashville: {
@@ -23,13 +21,12 @@ const shaders = Shaders.create({
 });
 
 const Nashville = ({ children: t }) => {
-    const texture = require("../resources/nashvilleMap.png");
     return (
         <Node
             shader={shaders.Nashville}
             uniforms={{
                 inputImageTexture: t,
-                inputImageTexture2: texture,
+                inputImageTexture2: require("../resources/nashvilleMap.png"),
             }}
         />
     );

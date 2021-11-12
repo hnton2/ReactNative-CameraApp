@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { Shaders, Node, GLSL } from "gl-react";
+import { GLSL, Node, Shaders } from "gl-react";
+import React from "react";
 
 const shaders = Shaders.create({
     colorify: {
@@ -16,6 +16,6 @@ const shaders = Shaders.create({
     },
 });
 
-export default function Colorify({ children, colorScale, interpolation }) {
-    return <Node shader={shaders.colorify} uniforms={{ colorScale, children }} />;
+export default function Colorify({ children: t, colorScale }) {
+    return <Node shader={shaders.colorify} uniforms={{ colorScale, children: t }} />;
 }

@@ -1,9 +1,9 @@
-import { Shaders, Node, GLSL } from 'gl-react';
-import React from 'react';
+import { GLSL, Node, Shaders } from "gl-react";
+import React from "react";
 
 const shaders = Shaders.create({
-  csb: {
-    frag: GLSL`
+    csb: {
+        frag: GLSL`
       precision highp float;
       varying vec2 uv;
       uniform sampler2D t;
@@ -26,31 +26,31 @@ const shaders = Shaders.create({
           c.a
         );
       }
-    `
-  }
+    `,
+    },
 });
 
 export const DefaultValue = Object.freeze({
-  brightness: 1,
-  contrast: 1,
-  saturation: 1,
+    brightness: 1,
+    contrast: 1,
+    saturation: 1,
 });
 
 export default function ContrastSaturationBrightness({
-  brightness = DefaultValue.brightness,
-  contrast = DefaultValue.contrast,
-  saturation = DefaultValue.saturation,
-  children: t
+    brightness = DefaultValue.brightness,
+    contrast = DefaultValue.contrast,
+    saturation = DefaultValue.saturation,
+    children: t,
 }) {
-  return (
-    <Node
-      shader={shaders.csb}
-      uniforms={{
-        brightness,
-        contrast,
-        saturation,
-        t,
-      }}
-    />
-  )
+    return (
+        <Node
+            shader={shaders.csb}
+            uniforms={{
+                brightness,
+                contrast,
+                saturation,
+                t: t,
+            }}
+        />
+    );
 }

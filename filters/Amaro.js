@@ -1,6 +1,5 @@
-import React, { useState } from "react";
-import { GLSL, Shaders, Node } from "gl-react";
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import { Node, Shaders } from "gl-react";
+import React from "react";
 
 const shaders = Shaders.create({
     Amaro: {
@@ -31,18 +30,14 @@ const shaders = Shaders.create({
 });
 
 export default function Amaro({ children: t }) {
-    const inputImageTexture2 = require("../resources/blackboard1024.png");
-    const inputImageTexture3 = require("../resources/overlayMap.png");
-    const inputImageTexture4 = require("../resources/amaroMap.png");
-
     return (
         <Node
             shader={shaders.Amaro}
             uniforms={{
                 inputImageTexture: t,
-                inputImageTexture2: inputImageTexture2,
-                inputImageTexture3: inputImageTexture3,
-                inputImageTexture4: inputImageTexture4,
+                inputImageTexture2: require("../resources/blackboard1024.png"),
+                inputImageTexture3: require("../resources/overlayMap.png"),
+                inputImageTexture4: require("../resources/amaroMap.png"),
             }}
         />
     );

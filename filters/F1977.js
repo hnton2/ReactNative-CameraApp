@@ -1,8 +1,6 @@
-import React from "react";
+import { GLSL, Node, Shaders } from "gl-react";
 import PropTypes from "prop-types";
-
-import { GLSL, Shaders, Node } from "gl-react";
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import React from "react";
 
 const shaders = Shaders.create({
     F1977: {
@@ -22,15 +20,17 @@ const shaders = Shaders.create({
     },
 });
 
-const F1977 = ({ children: t }) => (
-    <Node
-        shader={shaders.F1977}
-        uniforms={{
-            inputImageTexture: t,
-            inputImageTexture2: require("../resources/1977map.png"),
-        }}
-    />
-);
+const F1977 = ({ children: t }) => {
+    return (
+        <Node
+            shader={shaders.F1977}
+            uniforms={{
+                inputImageTexture: t,
+                inputImageTexture2: require("../resources/1977map.png"),
+            }}
+        />
+    );
+};
 
 F1977.propTypes = {
     children: PropTypes.object.isRequired,

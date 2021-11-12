@@ -7,7 +7,6 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import CameraScreen from "./screens/Camera";
 import GalleryScreen from "./screens/Gallery";
-import PhotoScreen from "./screens/Photo";
 import { Buffer } from "buffer";
 import EditScreen from "./screens/Edit";
 
@@ -27,7 +26,6 @@ export default function App() {
                 >
                     <Stack.Screen name="Camera" component={CameraScreen} />
                     <Stack.Screen name="Gallery" component={GalleryScreen} />
-                    <Stack.Screen name="Photo" component={PhotoScreen} />
                     <Stack.Screen name="Edit" component={EditScreen} />
                 </Stack.Navigator>
             </NavigationContainer>

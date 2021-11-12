@@ -1,8 +1,6 @@
-import React from "react";
+import { GLSL, Node, Shaders } from "gl-react";
 import PropTypes from "prop-types";
-
-import { GLSL, Shaders, Node } from "gl-react";
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import React from "react";
 
 const shaders = Shaders.create({
     Sierra: {
@@ -29,17 +27,19 @@ const shaders = Shaders.create({
     },
 });
 
-const Sierra = ({ children: t }) => (
-    <Node
-        shader={shaders.Sierra}
-        uniforms={{
-            inputImageTexture: t,
-            inputImageTexture2: require("../resources/sierraVignette.png"),
-            inputImageTexture3: require("../resources/overlayMap.png"),
-            inputImageTexture4: require("../resources/sierraMap.png"),
-        }}
-    />
-);
+const Sierra = ({ children: t }) => {
+    return (
+        <Node
+            shader={shaders.Sierra}
+            uniforms={{
+                inputImageTexture: t,
+                inputImageTexture2: require("../resources/sierraVignette.png"),
+                inputImageTexture3: require("../resources/overlayMap.png"),
+                inputImageTexture4: require("../resources/sierraMap.png"),
+            }}
+        />
+    );
+};
 
 Sierra.propTypes = {
     children: PropTypes.object.isRequired,

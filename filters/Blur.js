@@ -1,11 +1,10 @@
-import { Shaders, Node, GLSL } from 'gl-react';
-import React from 'react';
-
-import directionForPassDefault from '../utils/directionForPassDefault';
+import { GLSL, Node, Shaders } from "gl-react";
+import React from "react";
+import directionForPassDefault from "../utils/directionForPassDefault";
 
 const shaders = Shaders.create({
-  blur: {
-    frag: GLSL`
+    blur: {
+        frag: GLSL`
       precision highp float;
       varying vec2 uv;
       uniform sampler2D t;
@@ -26,35 +25,35 @@ const shaders = Shaders.create({
       void main () {
         gl_FragColor = blur9(t, uv, resolution, direction);
       }
-    `
-  }
+    `,
+    },
 });
 
 export const DefaultValue = 0;
 
 export default function Blur({
-  width,
-  height,
-  factor = DefaultValue,
-  children,
-  passes = 2,
-  directionForPass = directionForPassDefault
+    width,
+    height,
+    factor = DefaultValue,
+    children,
+    passes = 2,
+    directionForPass = directionForPassDefault,
 }) {
-  const rec = pass =>
-    pass <= 0 ? (
-      children
-    ) : (
-      <Node
-        shader={shaders.blur}
-        width={width}
-        height={height}
-        uniforms={{
-          direction: directionForPass(pass, factor, passes),
-          resolution: [width, height],
-          t: rec(pass - 1)
-        }}
-      />
-    );
+    const rec = (pass) =>
+        pass <= 0 ? (
+            children
+        ) : (
+            <Node
+                shader={shaders.blur}
+                width={width}
+                height={height}
+                uniforms={{
+                    direction: directionForPass(pass, factor, passes),
+                    resolution: [width, height],
+                    t: rec(pass - 1),
+                }}
+            />
+        );
 
-  return rec(passes);
+    return rec(passes);
 }

@@ -4,11 +4,38 @@ import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Icon from "react-native-vector-icons/Ionicons";
-import FilterList from "./FilterList";
-import EffectList from "./EffectList";
-import Normal from "../filters/Normal";
+import FilterList from "../components/FilterList";
+import EffectList from "../components/EffectList";
 import { Surface } from "gl-react-expo";
 import "webgltexture-loader-expo-camera";
+import filterType from "../constants/filterType";
+
+import Temperature from "../filters/Temperature";
+import Hue from "../filters/Hue";
+import Negative from "../filters/Negative";
+import Sepia from "../filters/Sepia";
+import Sharpen from "../filters/Sharpen";
+import Saturate from "../filters/Saturate";
+
+import Amaro from "../filters/Amaro";
+import Brannan from "../filters/Brannan";
+import Earlybird from "../filters/Earlybird";
+import F1977 from "../filters/F1977";
+import Hefe from "../filters/Hefe";
+import Hudson from "../filters/Hudson";
+import Inkwell from "../filters/Inkwell";
+import Lokofi from "../filters/Lokofi";
+import LordKelvin from "../filters/LordKelvin";
+import Nashville from "../filters/Nashville";
+import Normal from "../filters/Normal";
+import Rise from "../filters/Rise";
+import Sierra from "../filters/Sierra";
+import Sutro from "../filters/Sutro";
+import Toaster from "../filters/Toaster";
+import Valencia from "../filters/Valencia";
+import Walden from "../filters/Walden";
+import XproII from "../filters/XproII";
+import FilterComponent from "../components/Filter";
 
 const renderTopBar = (navigation) => (
     <View style={styles.topBar}>
@@ -75,6 +102,7 @@ const renderBottomBar = ({ texture, changePhoto }) => {
 function EditScreen({ route, navigation }) {
     const { photo } = route.params;
     const [texture, setTexture] = useState(null);
+    const [filter, setFilter] = useState(filterType.Normal);
 
     useEffect(() => {
         const loadAsync = async () => {
@@ -93,8 +121,8 @@ function EditScreen({ route, navigation }) {
         loadAsync();
     }, []);
 
-    const changePhoto = (photo) => {
-        setTexture(photo);
+    const changePhoto = (filterStr) => {
+        setFilter(filterStr);
     };
 
     return (
@@ -102,7 +130,58 @@ function EditScreen({ route, navigation }) {
             {renderTopBar(navigation)}
             <View style={styles.main}>
                 {texture ? (
-                    <Image source={{ uri: texture.uri }} style={{ width: texture.width, height: texture.height }} />
+                    <Surface style={{ width: texture.width, height: texture.height }}>
+                        {filter === filterType.Amaro && <FilterComponent component={Amaro} photoUri={texture.uri} />}
+                        {filter === filterType.Brannan && (
+                            <FilterComponent component={Brannan} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Earlybird && (
+                            <FilterComponent component={Earlybird} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.F1977 && <FilterComponent component={F1977} photoUri={texture.uri} />}
+                        {filter === filterType.Hefe && <FilterComponent component={Hefe} photoUri={texture.uri} />}
+                        {filter === filterType.Hudson && <FilterComponent component={Hudson} photoUri={texture.uri} />}
+                        {filter === filterType.Inkwell && (
+                            <FilterComponent component={Inkwell} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Lokofi && <FilterComponent component={Lokofi} photoUri={texture.uri} />}
+                        {filter === filterType.LordKelvin && (
+                            <FilterComponent component={LordKelvin} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Nashville && (
+                            <FilterComponent component={Nashville} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Normal && <FilterComponent component={Normal} photoUri={texture.uri} />}
+                        {filter === filterType.Rise && <FilterComponent component={Rise} photoUri={texture.uri} />}
+                        {filter === filterType.Sierra && <FilterComponent component={Sierra} photoUri={texture.uri} />}
+                        {filter === filterType.Sutro && <FilterComponent component={Sutro} photoUri={texture.uri} />}
+                        {filter === filterType.Toaster && (
+                            <FilterComponent component={Toaster} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Valencia && (
+                            <FilterComponent component={Valencia} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Walden && <FilterComponent component={Walden} photoUri={texture.uri} />}
+                        {filter === filterType.XproII && <FilterComponent component={XproII} photoUri={texture.uri} />}
+                        {filter === filterType.Temperature && (
+                            <FilterComponent component={Temperature} factor={6300} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Hue && (
+                            <FilterComponent component={Hue} factor={2} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Negative && (
+                            <FilterComponent component={Negative} factor={0.25} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Sharpen && (
+                            <FilterComponent component={Sharpen} factor={0.25} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Saturate && (
+                            <FilterComponent component={Saturate} factor={2} photoUri={texture.uri} />
+                        )}
+                        {filter === filterType.Sepia && (
+                            <FilterComponent component={Sepia} factor={1.5} photoUri={texture.uri} />
+                        )}
+                    </Surface>
                 ) : (
                     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
                         <ActivityIndicator size="large" color="#fff" />

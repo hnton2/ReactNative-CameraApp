@@ -1,8 +1,6 @@
-import React from "react";
+import { GLSL, Node, Shaders } from "gl-react";
 import PropTypes from "prop-types";
-
-import { GLSL, Shaders, Node } from "gl-react";
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import React from "react";
 
 const shaders = Shaders.create({
     LordKelvin: {
@@ -26,15 +24,17 @@ const shaders = Shaders.create({
     },
 });
 
-const LordKelvin = ({ children: t }) => (
-    <Node
-        shader={shaders.LordKelvin}
-        uniforms={{
-            inputImageTexture: t,
-            inputImageTexture2: require("../resources/kelvinMap.png"),
-        }}
-    />
-);
+const LordKelvin = ({ children: t }) => {
+    return (
+        <Node
+            shader={shaders.LordKelvin}
+            uniforms={{
+                inputImageTexture: t,
+                inputImageTexture2: require("../resources/kelvinMap.png"),
+            }}
+        />
+    );
+};
 
 LordKelvin.propTypes = {
     children: PropTypes.object.isRequired,

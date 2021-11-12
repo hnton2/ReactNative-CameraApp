@@ -1,8 +1,6 @@
-import React from "react";
+import { GLSL, Node, Shaders } from "gl-react";
 import PropTypes from "prop-types";
-
-import { GLSL, Shaders, Node } from "gl-react";
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import React from "react";
 
 const shaders = Shaders.create({
     XproII: {
@@ -27,16 +25,18 @@ const shaders = Shaders.create({
     },
 });
 
-const XproII = ({ children: t }) => (
-    <Node
-        shader={shaders.XproII}
-        uniforms={{
-            inputImageTexture: t,
-            inputImageTexture2: require("../resources/xproMap.png"),
-            inputImageTexture3: require("../resources/vignetteMap.png"),
-        }}
-    />
-);
+const XproII = ({ children: t }) => {
+    return (
+        <Node
+            shader={shaders.XproII}
+            uniforms={{
+                inputImageTexture: t,
+                inputImageTexture2: require("../resources/xproMap.png"),
+                inputImageTexture3: require("../resources/vignetteMap.png"),
+            }}
+        />
+    );
+};
 
 XproII.propTypes = {
     children: PropTypes.object.isRequired,

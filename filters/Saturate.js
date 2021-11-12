@@ -1,4 +1,4 @@
-import { Shaders, Node, GLSL } from "gl-react";
+import { GLSL, Node, Shaders } from "gl-react";
 import React from "react";
 
 const shaders = Shaders.create({
@@ -17,6 +17,6 @@ const shaders = Shaders.create({
     },
 });
 
-export default function Saturate({ factor, children }) {
-    return <Node shader={shaders.Saturate} uniforms={{ factor, t: children }} />;
+export default function Saturate({ factor, children: t }) {
+    return <Node shader={shaders.Saturate} uniforms={{ factor, t }} />;
 }

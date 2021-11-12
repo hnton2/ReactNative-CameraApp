@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Image, View, Platform, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
-import EditScreen from "./Edit";
+import EditScreen from "../screens/Edit";
 import Icon from "react-native-vector-icons/Ionicons";
 
 export default function PhotoScreen({ photo, editPhoto }) {

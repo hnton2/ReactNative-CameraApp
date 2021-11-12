@@ -1,8 +1,6 @@
-import React from "react";
+import { GLSL, Node, Shaders } from "gl-react";
 import PropTypes from "prop-types";
-
-import { GLSL, Shaders, Node } from "gl-react";
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import React from "react";
 
 const shaders = Shaders.create({
     Hefe: {
@@ -41,19 +39,21 @@ const shaders = Shaders.create({
     },
 });
 
-const Hefe = ({ children: t }) => (
-    <Node
-        shader={shaders.Hefe}
-        uniforms={{
-            inputImageTexture: t,
-            inputImageTexture2: require("../resources/edgeBurn.png"),
-            inputImageTexture3: require("../resources/hefeMap.png"),
-            inputImageTexture4: require("../resources/hefeGradientMap.png"),
-            inputImageTexture5: require("../resources/hefeSoftLight.png"),
-            inputImageTexture6: require("../resources/hefeMetal.png"),
-        }}
-    />
-);
+const Hefe = ({ children: t }) => {
+    return (
+        <Node
+            shader={shaders.Hefe}
+            uniforms={{
+                inputImageTexture: t,
+                inputImageTexture2: require("../resources/edgeBurn.png"),
+                inputImageTexture3: require("../resources/hefeMap.png"),
+                inputImageTexture4: require("../resources/hefeGradientMap.png"),
+                inputImageTexture5: require("../resources/hefeSoftLight.png"),
+                inputImageTexture6: require("../resources/hefeMetal.png"),
+            }}
+        />
+    );
+};
 
 Hefe.propTypes = {
     children: PropTypes.object.isRequired,

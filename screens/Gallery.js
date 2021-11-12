@@ -1,8 +1,8 @@
 import * as MediaLibrary from "expo-media-library";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import PhotoScreen from "./Photo";
 import Icon from "react-native-vector-icons/Ionicons";
+import PhotoScreen from "../components/Photo";
 
 const ALBUM_NAME = "My Album";
 

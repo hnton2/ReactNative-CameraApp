@@ -1,8 +1,6 @@
-import React from "react";
+import { GLSL, Node, Shaders } from "gl-react";
 import PropTypes from "prop-types";
-
-import { GLSL, Shaders, Node } from "gl-react";
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import React from "react";
 
 const shaders = Shaders.create({
     Rise: {
@@ -29,17 +27,19 @@ const shaders = Shaders.create({
     },
 });
 
-const Rise = ({ children: t }) => (
-    <Node
-        shader={shaders.Rise}
-        uniforms={{
-            inputImageTexture: t,
-            inputImageTexture2: require("../resources/blackboard1024.png"),
-            inputImageTexture3: require("../resources/overlayMap.png"),
-            inputImageTexture4: require("../resources/riseMap.png"),
-        }}
-    />
-);
+const Rise = ({ children: t }) => {
+    return (
+        <Node
+            shader={shaders.Rise}
+            uniforms={{
+                inputImageTexture: t,
+                inputImageTexture2: require("../resources/blackboard1024.png"),
+                inputImageTexture3: require("../resources/overlayMap.png"),
+                inputImageTexture4: require("../resources/riseMap.png"),
+            }}
+        />
+    );
+};
 
 Rise.propTypes = {
     children: PropTypes.object.isRequired,

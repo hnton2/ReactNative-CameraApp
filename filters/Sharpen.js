@@ -1,9 +1,9 @@
-import { Shaders, Node, GLSL } from 'gl-react';
-import React from 'react';
+import { GLSL, Node, Shaders } from "gl-react";
+import React from "react";
 
 const shaders = Shaders.create({
-  sharpen: {
-    frag: GLSL`
+    sharpen: {
+        frag: GLSL`
       precision highp float;
       varying vec2 uv;
       uniform sampler2D t;
@@ -25,21 +25,21 @@ const shaders = Shaders.create({
 
         gl_FragColor = vec4(col, 1.0);
       }
-    `
-  }
+    `,
+    },
 });
 
 export const DefaultValue = 0;
 
 export default function Sharpen({ factor = DefaultValue, width, height, children: t }) {
-  return (
-    <Node
-      shader={shaders.sharpen}
-      uniforms={{
-        factor,
-        resolution: [width, height],
-        t,
-      }}
-    />
-  )
+    return (
+        <Node
+            shader={shaders.sharpen}
+            uniforms={{
+                factor,
+                resolution: [width, height],
+                t: t,
+            }}
+        />
+    );
 }

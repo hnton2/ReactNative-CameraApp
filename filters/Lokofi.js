@@ -1,8 +1,6 @@
-import React from "react";
+import { GLSL, Node, Shaders } from "gl-react";
 import PropTypes from "prop-types";
-
-import { GLSL, Shaders, Node } from "gl-react";
-import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
+import React from "react";
 
 const shaders = Shaders.create({
     Lokofi: {
@@ -31,16 +29,18 @@ const shaders = Shaders.create({
     },
 });
 
-const Lokofi = ({ children: t }) => (
-    <Node
-        shader={shaders.Lokofi}
-        uniforms={{
-            inputImageTexture: t,
-            inputImageTexture2: require("../resources/lomoMap.png"),
-            inputImageTexture3: require("../resources/vignetteMap.png"),
-        }}
-    />
-);
+const Lokofi = ({ children: t }) => {
+    return (
+        <Node
+            shader={shaders.Lokofi}
+            uniforms={{
+                inputImageTexture: t,
+                inputImageTexture2: require("../resources/lomoMap.png"),
+                inputImageTexture3: require("../resources/vignetteMap.png"),
+            }}
+        />
+    );
+};
 
 Lokofi.propTypes = {
     children: PropTypes.object.isRequired,

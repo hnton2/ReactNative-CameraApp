@@ -1,7 +1,6 @@
-import React from "react";
+import { GLSL, Node, Shaders } from "gl-react";
 import PropTypes from "prop-types";
-
-import { GLSL, Shaders, Node } from "gl-react";
+import React from "react";
 
 const shaders = Shaders.create({
     Normal: {
@@ -16,14 +15,16 @@ const shaders = Shaders.create({
     },
 });
 
-const Normal = ({ children: t }) => (
-    <Node
-        shader={shaders.Normal}
-        uniforms={{
-            inputImageTexture: t,
-        }}
-    />
-);
+const Normal = ({ children: t }) => {
+    return (
+        <Node
+            shader={shaders.Normal}
+            uniforms={{
+                inputImageTexture: t,
+            }}
+        />
+    );
+};
 
 Normal.propTypes = {
     children: PropTypes.object.isRequired,

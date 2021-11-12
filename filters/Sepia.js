@@ -1,7 +1,7 @@
-import { Shaders, Node, GLSL } from "gl-react";
+import { GLSL, Node, Shaders } from "gl-react";
 import React from "react";
-
 import { mixArrays } from "../helpers/MixMatrix";
+
 const shaders = Shaders.create({
     sepia: {
         frag: GLSL`
@@ -31,7 +31,7 @@ export default function Sepia({ factor = DefaultValue, children: t }) {
             shader={shaders.sepia}
             uniforms={{
                 sepia,
-                t,
+                t: t,
             }}
         />
     );

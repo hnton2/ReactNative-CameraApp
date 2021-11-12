@@ -1,9 +1,9 @@
-import { Shaders, Node, GLSL } from 'gl-react';
-import React from 'react';
+import { GLSL, Node, Shaders } from "gl-react";
+import React from "react";
 
 const shaders = Shaders.create({
-  negative: {
-    frag: GLSL`
+    negative: {
+        frag: GLSL`
       precision highp float;
       varying vec2 uv;
       uniform sampler2D t;
@@ -14,20 +14,20 @@ const shaders = Shaders.create({
 
         gl_FragColor = vec4(mix(c.rgb, 1.0 - c.rgb, factor), c.a);
       }
-    `
-  }
+    `,
+    },
 });
 
 export const DefaultValue = 0;
 
 export default function Negative({ factor = DefaultValue, children: t }) {
-  return (
-    <Node
-      shader={shaders.negative}
-      uniforms={{
-        factor,
-        t,
-      }}
-    />
-  )
+    return (
+        <Node
+            shader={shaders.negative}
+            uniforms={{
+                factor,
+                t,
+            }}
+        />
+    );
 }

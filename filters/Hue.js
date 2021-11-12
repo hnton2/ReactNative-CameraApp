@@ -1,4 +1,4 @@
-import { Shaders, Node, GLSL } from "gl-react";
+import { GLSL, Node, Shaders } from "gl-react";
 import React from "react";
 
 const shaders = Shaders.create({
