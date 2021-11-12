@@ -1,3 +1,4 @@
+import { useIsFocused } from "@react-navigation/core";
 import * as MediaLibrary from "expo-media-library";
 import React, { useEffect, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -22,10 +23,11 @@ const fetchAlbums = async () => {
 
 export default function GalleryScreen({ navigation }) {
     const [photos, setPhotos] = useState([]);
+    const isFocused = useIsFocused();
 
     useEffect(() => {
         fetchAlbums().then((albums) => setPhotos(albums.assets));
-    }, []);
+    }, [isFocused]);
 
     const editPhoto = (photo) => {
         return navigation.navigate("Edit", { photo: photo });

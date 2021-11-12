@@ -132,7 +132,8 @@ function EditScreen({ route, navigation }) {
         if (!captureImage) return;
 
         const result = await captureImage.glView.capture();
-        saveImageToAlbum(result);
+        await saveImageToAlbum(result);
+        navigation.goBack();
     };
 
     return (
