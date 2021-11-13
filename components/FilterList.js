@@ -44,10 +44,6 @@ function FilterButton({ component, name, uri, changeFilter, factor = 1 }) {
 }
 
 function FilterList({ texture, changeFilter }) {
-    const handleChangeFilter = (type) => {
-        changeFilter(type);
-    };
-
     return (
         <ScrollView style={{ padding: 5 }} horizontal showsHorizontalScrollIndicator={false}>
             <FilterButton component={Amaro} name={filterType.Amaro} uri={texture.uri} changeFilter={changeFilter} />

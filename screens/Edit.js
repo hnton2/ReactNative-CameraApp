@@ -37,6 +37,7 @@ import Walden from "../filters/Walden";
 import XproII from "../filters/XproII";
 import FilterComponent from "../components/Filter";
 import { saveImageToAlbum } from "../helpers/Library";
+import Instagram from "../filters/Instargram";
 
 const renderTopBar = ({ navigation, saveImage }) => (
     <View style={styles.topBar}>
@@ -49,7 +50,7 @@ const renderTopBar = ({ navigation, saveImage }) => (
     </View>
 );
 
-const renderBottomBar = ({ texture, changeFilter }) => {
+const renderBottomBar = ({ texture, changeFilter, effectState, changeEffect }) => {
     const [showFilter, setShowFilter] = useState(false);
     const [showEffect, setShowEffect] = useState(false);
     const [showCrop, setShowCrop] = useState(false);
@@ -74,7 +75,9 @@ const renderBottomBar = ({ texture, changeFilter }) => {
         <View style={styles.bottomBar}>
             <View style={styles.tabView}>
                 {showFilter && <FilterList texture={texture} changeFilter={changeFilter} />}
-                {showEffect && <EffectList texture={texture} changeFilter={changeFilter} />}
+                {showEffect && (
+                    <EffectList changeFilter={changeFilter} effectState={effectState} changeEffect={changeEffect} />
+                )}
             </View>
 
             <View style={styles.tab}>
@@ -101,9 +104,28 @@ const renderBottomBar = ({ texture, changeFilter }) => {
 };
 
 function EditScreen({ route, navigation }) {
+    let captureImage;
     const { photo } = route.params;
     const [texture, setTexture] = useState(null);
     const [filter, setFilter] = useState(filterType.Normal);
+    const changeFilter = (filterStr) => {
+        setFilter(filterStr);
+    };
+    const [effect, setEffect] = useState({
+        saturation: 1,
+        brightness: 1,
+        contrast: 1,
+        hue: 0,
+        sepia: 0,
+        gray: 0,
+        mixFactor: 0,
+    });
+    const changeEffect = (name, value) => {
+        setEffect((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
 
     useEffect(() => {
         const loadAsync = async () => {
@@ -121,12 +143,6 @@ function EditScreen({ route, navigation }) {
         };
         loadAsync();
     }, []);
-
-    const changeFilter = (filterStr) => {
-        setFilter(filterStr);
-    };
-
-    let captureImage;
 
     const saveImage = async () => {
         if (!captureImage) return;
@@ -195,6 +211,9 @@ function EditScreen({ route, navigation }) {
                         {filter === filterType.Sepia && (
                             <FilterComponent component={Sepia} factor={1.5} photoUri={texture.uri} />
                         )}
+                        {filter === "effectMode" && (
+                            <FilterComponent component={Instagram} {...effect} photoUri={texture.uri} />
+                        )}
                     </Surface>
                 ) : (
                     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -202,7 +221,7 @@ function EditScreen({ route, navigation }) {
                     </View>
                 )}
             </View>
-            {renderBottomBar({ texture: texture, changeFilter: changeFilter })}
+            {renderBottomBar({ texture: texture, changeFilter, effectState: effect, changeEffect })}
         </View>
     );
 }

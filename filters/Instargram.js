@@ -1,7 +1,7 @@
 import { Node, Shaders } from "gl-react";
 import React from "react";
 
-const shaders = GL.Shaders.create({
+const shaders = Shaders.create({
     instagram: {
         frag: `
         precision highp float;
