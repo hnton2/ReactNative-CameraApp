@@ -38,6 +38,7 @@ import XproII from "../filters/XproII";
 import FilterComponent from "../components/Filter";
 import { saveImageToAlbum } from "../helpers/Library";
 import Instagram from "../filters/Instargram";
+import CropList from "../components/CropList";
 
 const renderTopBar = ({ navigation, saveImage }) => (
     <View style={styles.topBar}>
@@ -50,7 +51,7 @@ const renderTopBar = ({ navigation, saveImage }) => (
     </View>
 );
 
-const renderBottomBar = ({ texture, changeFilter, effectState, changeEffect }) => {
+const renderBottomBar = ({ texture, currentImage, changeFilter, effectState, changeEffect, changeManipulator }) => {
     const [showFilter, setShowFilter] = useState(false);
     const [showEffect, setShowEffect] = useState(false);
     const [showCrop, setShowCrop] = useState(false);
@@ -77,6 +78,13 @@ const renderBottomBar = ({ texture, changeFilter, effectState, changeEffect }) =
                 {showFilter && <FilterList texture={texture} changeFilter={changeFilter} />}
                 {showEffect && (
                     <EffectList changeFilter={changeFilter} effectState={effectState} changeEffect={changeEffect} />
+                )}
+                {showCrop && (
+                    <CropList
+                        changeFilter={changeFilter}
+                        currentImage={currentImage}
+                        changeManipulator={changeManipulator}
+                    />
                 )}
             </View>
 
@@ -107,6 +115,7 @@ function EditScreen({ route, navigation }) {
     let captureImage;
     const { photo } = route.params;
     const [texture, setTexture] = useState(null);
+    const [currentImg, setCurrentImg] = useState(null);
     const [filter, setFilter] = useState(filterType.Normal);
     const changeFilter = (filterStr) => {
         setFilter(filterStr);
@@ -127,6 +136,7 @@ function EditScreen({ route, navigation }) {
         }));
     };
 
+    // format image for filter
     useEffect(() => {
         const loadAsync = async () => {
             await FileSystem.copyAsync({
@@ -140,6 +150,7 @@ function EditScreen({ route, navigation }) {
                 { compress: 1, format: "png" }
             );
             setTexture(imageResult);
+            setCurrentImg(imageResult);
         };
         loadAsync();
     }, []);
@@ -151,6 +162,21 @@ function EditScreen({ route, navigation }) {
         await saveImageToAlbum(result);
         navigation.goBack();
     };
+
+    // get template image when filter
+    console.log("t", currentImg);
+    useEffect(() => {
+        const currentImage = async () => {
+            if (!captureImage) return;
+            const result = await captureImage.glView.capture();
+            setCurrentImg(result);
+        };
+        currentImage();
+    }, [filter]);
+    const changeManipulator = (img) => {
+        setCurrentImg(img);
+    };
+    console.log(currentImg);
 
     return (
         <View style={styles.container}>
@@ -214,6 +240,8 @@ function EditScreen({ route, navigation }) {
                         {filter === "effectMode" && (
                             <FilterComponent component={Instagram} {...effect} photoUri={texture.uri} />
                         )}
+                        {/* cropMode image when choose filter or effect */}
+                        {filter === "cropMode" && <FilterComponent component={Normal} photoUri={currentImg.uri} />}
                     </Surface>
                 ) : (
                     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -221,7 +249,14 @@ function EditScreen({ route, navigation }) {
                     </View>
                 )}
             </View>
-            {renderBottomBar({ texture: texture, changeFilter, effectState: effect, changeEffect })}
+            {renderBottomBar({
+                texture: texture,
+                currentImage: currentImg,
+                changeFilter,
+                effectState: effect,
+                changeEffect,
+                changeManipulator,
+            })}
         </View>
     );
 }
