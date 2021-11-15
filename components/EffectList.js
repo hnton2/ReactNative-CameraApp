@@ -1,11 +1,9 @@
-import { Surface } from "gl-react-expo";
 import React, { useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import "webgltexture-loader-expo-camera";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import Slider from "@react-native-community/slider";
+import FSlider from "./FSlider";
 
-function EffectList({ changeFilter, effectState, changeEffect }) {
+function EffectList({ changeFilter, effectState, changeEffect, onResetEffect }) {
     const [effect, setEffect] = useState(null);
     const handleEffect = (str) => {
         if (str === effect) setEffect(null);
@@ -13,237 +11,97 @@ function EffectList({ changeFilter, effectState, changeEffect }) {
     };
 
     // Value slider change
-    const handlePreview = (value) => {
+    const _onChange = (value) => {
         changeEffect(effect, value);
-        changeFilter("effectMode");
+        changeFilter && changeFilter("effectMode");
+    };
+
+    const _onHidden = () => {
+        setEffect(null);
+    };
+
+    const _onReset = () => {
+        onResetEffect(effect);
     };
 
     return (
         <View style={{ flex: 1 }}>
             {effect === "saturation" && (
-                <View style={{ width: 400 }}>
-                    <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 5 }}>
-                        <Slider
-                            minimumValue={0}
-                            maximumValue={3}
-                            value={effectState.saturation}
-                            minimumTrackTintColor="#FFFFFF"
-                            maximumTrackTintColor="#ccc"
-                            onValueChange={handlePreview}
-                            style={styles.slider}
-                        />
-                    </View>
-                    <View style={styles.sliderBar}>
-                        {/* Button apply effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="check" color="white" size={32} />
-                        </TouchableOpacity>
-                        <View>
-                            <Text style={{ color: "#fff" }}>Saturation</Text>
-                            <Text style={{ color: "#fff", textAlign: "center" }}>
-                                {Math.round(effectState.saturation * 100) / 100}
-                            </Text>
-                        </View>
-
-                        {/* Button default effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="close" color="white" size={32} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                <FSlider
+                    name="saturation"
+                    value={effectState.saturation}
+                    min={0}
+                    max={3}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
             )}
             {effect === "brightness" && (
-                <View style={{ width: 400 }}>
-                    <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 5 }}>
-                        <Slider
-                            minimumValue={0}
-                            maximumValue={3}
-                            value={effectState.brightness}
-                            minimumTrackTintColor="#FFFFFF"
-                            maximumTrackTintColor="#ccc"
-                            onValueChange={handlePreview}
-                            style={styles.slider}
-                        />
-                    </View>
-                    <View style={styles.sliderBar}>
-                        {/* Button apply effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="check" color="white" size={32} />
-                        </TouchableOpacity>
-
-                        <View>
-                            <Text style={{ color: "#fff" }}>Brightness</Text>
-                            <Text style={{ color: "#fff", textAlign: "center" }}>
-                                {Math.round(effectState.brightness * 100) / 100}
-                            </Text>
-                        </View>
-                        {/* Button default effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="close" color="white" size={32} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                <FSlider
+                    name="brightness"
+                    value={effectState.brightness}
+                    min={0}
+                    max={5}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
             )}
             {effect === "contrast" && (
-                <View style={{ width: 400 }}>
-                    <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 5 }}>
-                        <Slider
-                            minimumValue={0}
-                            maximumValue={3}
-                            value={effectState.contrast}
-                            minimumTrackTintColor="#FFFFFF"
-                            maximumTrackTintColor="#ccc"
-                            onValueChange={handlePreview}
-                            style={styles.slider}
-                        />
-                    </View>
-                    <View style={styles.sliderBar}>
-                        {/* Button apply effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="check" color="white" size={32} />
-                        </TouchableOpacity>
-
-                        <Text style={{ color: "#fff" }}>Contrast</Text>
-                        <View>
-                            <Text style={{ color: "#fff" }}>Contrast</Text>
-                            <Text style={{ color: "#fff", textAlign: "center" }}>
-                                {Math.round(effectState.contrast * 100) / 100}
-                            </Text>
-                        </View>
-                        {/* Button default effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="close" color="white" size={32} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                <FSlider
+                    name="contrast"
+                    value={effectState.contrast}
+                    min={-10}
+                    max={10}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
             )}
             {effect === "hue" && (
-                <View style={{ width: 400 }}>
-                    <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 5 }}>
-                        <Slider
-                            minimumValue={0}
-                            maximumValue={10}
-                            value={effectState.hue}
-                            minimumTrackTintColor="#FFFFFF"
-                            maximumTrackTintColor="#ccc"
-                            onValueChange={handlePreview}
-                            style={styles.slider}
-                        />
-                    </View>
-                    <View style={styles.sliderBar}>
-                        {/* Button apply effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="check" color="white" size={32} />
-                        </TouchableOpacity>
-
-                        <View>
-                            <Text style={{ color: "#fff" }}>Hue</Text>
-                            <Text style={{ color: "#fff", textAlign: "center" }}>
-                                {Math.round(effectState.hue * 100) / 100}
-                            </Text>
-                        </View>
-                        {/* Button default effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="close" color="white" size={32} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                <FSlider
+                    name="hue"
+                    value={effectState.hue}
+                    min={0}
+                    max={6}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
             )}
             {effect === "sepia" && (
-                <View style={{ width: 400 }}>
-                    <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 5 }}>
-                        <Slider
-                            minimumValue={0}
-                            maximumValue={1}
-                            value={effectState.sepia}
-                            minimumTrackTintColor="#FFFFFF"
-                            maximumTrackTintColor="#ccc"
-                            onValueChange={handlePreview}
-                            style={styles.slider}
-                        />
-                    </View>
-                    <View style={styles.sliderBar}>
-                        {/* Button apply effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="check" color="white" size={32} />
-                        </TouchableOpacity>
-
-                        <View>
-                            <Text style={{ color: "#fff" }}>Sepia</Text>
-                            <Text style={{ color: "#fff", textAlign: "center" }}>
-                                {Math.round(effectState.sepia * 100) / 100}
-                            </Text>
-                        </View>
-                        {/* Button default effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="close" color="white" size={32} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                <FSlider
+                    name="sepia"
+                    value={effectState.sepia}
+                    min={-5}
+                    max={5}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
             )}
             {effect === "gray" && (
-                <View style={{ width: 400 }}>
-                    <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 5 }}>
-                        <Slider
-                            minimumValue={0}
-                            maximumValue={1}
-                            value={effectState.gray}
-                            minimumTrackTintColor="#FFFFFF"
-                            maximumTrackTintColor="#ccc"
-                            onValueChange={handlePreview}
-                            style={styles.slider}
-                        />
-                    </View>
-                    <View style={styles.sliderBar}>
-                        {/* Button apply effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="check" color="white" size={32} />
-                        </TouchableOpacity>
-
-                        <View>
-                            <Text style={{ color: "#fff" }}>Gray</Text>
-                            <Text style={{ color: "#fff", textAlign: "center" }}>
-                                {Math.round(effectState.gray * 100) / 100}
-                            </Text>
-                        </View>
-                        {/* Button default effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="close" color="white" size={32} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                <FSlider
+                    name="gray"
+                    value={effectState.gray}
+                    min={0}
+                    max={1}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
             )}
             {effect === "mixFactor" && (
-                <View style={{ width: 400 }}>
-                    <View style={{ justifyContent: "center", alignItems: "center", marginBottom: 5 }}>
-                        <Slider
-                            minimumValue={0}
-                            maximumValue={2}
-                            value={effectState.mixFactor}
-                            minimumTrackTintColor="#FFFFFF"
-                            maximumTrackTintColor="#ccc"
-                            onValueChange={handlePreview}
-                            style={styles.slider}
-                        />
-                    </View>
-                    <View style={styles.sliderBar}>
-                        {/* Button apply effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="check" color="white" size={32} />
-                        </TouchableOpacity>
-
-                        <View>
-                            <Text style={{ color: "#fff" }}>MixFactor</Text>
-                            <Text style={{ color: "#fff", textAlign: "center" }}>
-                                {Math.round(effectState.mixFactor * 100) / 100}
-                            </Text>
-                        </View>
-                        {/* Button default effect */}
-                        <TouchableOpacity onPress={() => setEffect(null)}>
-                            <MaterialIcons name="close" color="white" size={32} />
-                        </TouchableOpacity>
-                    </View>
-                </View>
+                <FSlider
+                    name="mixFactor"
+                    value={effectState.mixFactor}
+                    min={0}
+                    max={2}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
             )}
             {!effect && (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>

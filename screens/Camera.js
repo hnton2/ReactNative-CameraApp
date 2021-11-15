@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import * as MediaLibrary from "expo-media-library";
 import { Camera } from "expo-camera";
@@ -6,7 +6,25 @@ import { AutoFocus, CameraType, FlashMode, WhiteBalance } from "expo-camera/buil
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import * as FaceDetector from "expo-face-detector";
-import { saveImage } from "../helpers/Library";
+import { GLSL, Node, Shaders } from "gl-react";
+import defaultEffect from "../constants/defaultEffect";
+import { Surface } from "gl-react-expo";
+import Instagram from "../filters/Instargram";
+import EffectList from "../components/EffectList";
+import { saveImageToAlbum } from "../helpers/Library";
+
+const shaders = Shaders.create({
+    YFlip: {
+        // NB we need to YFlip the stream
+        frag: GLSL`
+        precision highp float;
+        varying vec2 uv;
+        uniform sampler2D t;
+        void main(){
+        gl_FragColor=texture2D(t, vec2(1.0-uv.x, 1.0 - uv.y));
+        }`,
+    },
+});
 
 const wbOrder = {
     auto: "sunny",
@@ -27,38 +45,93 @@ const wbIcons = {
 };
 
 export default function CameraScreen({ navigation }) {
-    let camera;
-    const [cameraProps, setCameraProps] = useState({
-        zoom: 0,
-        autoFocus: "on",
-        type: CameraType.back,
-        depth: 0,
-        whiteBalance: "auto",
-        permissionsGranted: false,
-        pictureSizes: [],
-        pictureSizeId: 0,
-        showMoreOptions: false,
-    });
+    const [camera, setCamera] = useState(null);
+    const [type, setType] = useState(CameraType.back);
+    const [autoFocus, setAutoFocus] = useState("on");
+    const [permissionGranted, setPermissionGranted] = useState(false);
+    const [whiteBalance, setWhiteBalance] = useState("auto");
     const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off);
     const [newPhoto, setNewPhoto] = useState(false);
     const [faceDetecting, setFaceDetecting] = useState(false);
     const [faces, setFaces] = useState([]);
+    const [showMoreOptions, setShowMoreOptions] = useState(false);
+    const [showEffect, setShowEffect] = useState(false);
+    const [showFilter, setShowFilter] = useState(false);
+    const [effect, setEffect] = useState({
+        saturation: defaultEffect.saturation,
+        brightness: defaultEffect.brightness,
+        contrast: defaultEffect.contrast,
+        hue: defaultEffect.hue,
+        sepia: defaultEffect.sepia,
+        gray: defaultEffect.gray,
+        mixFactor: defaultEffect.mixFactor,
+    });
+    const [raf, setRaf] = useState(null);
+
+    // handle camera error
+    const handleMountError = ({ message }) => console.error(message);
+
+    // init GL camera
+    const onCameraRef = (camera) => {
+        setCamera(camera);
+    };
+    useEffect(() => {
+        const loop = () => {
+            setRaf(requestAnimationFrame(loop));
+        };
+        setRaf(requestAnimationFrame(loop));
+        return () => {
+            cancelAnimationFrame(raf);
+        };
+    }, []);
+
+    const onResetEffect = (effectName) => {
+        setEffect((prevState) => ({ ...prevState, [effectName]: defaultEffect[effectName] }));
+    };
+    const changeEffect = (name, value) => {
+        setEffect((prevState) => ({
+            ...prevState,
+            [name]: value,
+        }));
+    };
 
     // Request Camera Permission
     useEffect(() => {
         Camera.requestCameraPermissionsAsync().then(({ status }) => {
-            setCameraProps({ ...cameraProps, permission: status, permissionsGranted: status === "granted" });
+            setPermissionGranted("granted");
         });
     }, []);
 
-    const toggleMoreOptions = () =>
-        setCameraProps((prevState) => ({ ...prevState, showMoreOptions: !prevState.showMoreOptions }));
+    // save image in library
+    function useMediaLibraryPermissions() {
+        const [permissions, setPermissions] = useState();
 
-    const toggleFacing = () =>
-        setCameraProps((prevState) => ({
-            ...prevState,
-            type: prevState.type === CameraType.back ? CameraType.front : CameraType.back,
-        }));
+        useEffect(() => {
+            async function askAsync() {
+                const response = await MediaLibrary.requestPermissionsAsync();
+                setPermissions(response);
+            }
+
+            askAsync();
+        }, []);
+
+        return [permissions];
+    }
+    const [permission] = useMediaLibraryPermissions();
+    let captureImage;
+    const takePicture = async () => {
+        if (captureImage) {
+            const photo = await captureImage.glView.capture();
+            //add to album
+            if (!permission) return null;
+            saveImageToAlbum(photo);
+            setNewPhoto(true);
+        }
+    };
+
+    // toggle button
+    const toggleMoreOptions = () => setShowMoreOptions(!showMoreOptions);
+    const toggleFacing = () => setType(type === CameraType.back ? CameraType.front : CameraType.back);
 
     const toggleFlash = () => {
         if (flashMode === Camera.Constants.FlashMode.torch) {
@@ -70,57 +143,21 @@ export default function CameraScreen({ navigation }) {
         }
     };
 
-    const toggleWB = () =>
-        setCameraProps((prevState) => ({ ...prevState, whiteBalance: wbOrder[prevState.whiteBalance] }));
+    const toggleWB = () => setWhiteBalance(wbOrder[whiteBalance]);
 
-    const toggleFocus = () =>
-        setCameraProps((prevState) => ({ ...prevState, autoFocus: prevState.autoFocus === "on" ? "off" : "on" }));
-
-    const zoomOut = () =>
-        setCameraProps((prevState) => ({ ...prevState, zoom: prevState.zoom - 0.1 < 0 ? 0 : prevState.zoom - 0.1 }));
-
-    const zoomIn = () =>
-        setCameraProps((prevState) => ({ ...prevState, zoom: prevState.zoom + 0.1 > 1 ? 1 : prevState.zoom + 0.1 }));
-
-    const setFocusDepth = (depth) => setCameraProps({ ...prevState, depth });
+    const toggleFocus = () => setAutoFocus(autoFocus === "on" ? "off" : "on");
 
     const toggleFaceDetection = () => setFaceDetecting(!faceDetecting);
-    console.log(faceDetecting);
-    function useMediaLibraryPermissions() {
-        const [permissions, setPermissions] = React.useState();
 
-        React.useEffect(() => {
-            async function askAsync() {
-                const response = await MediaLibrary.requestPermissionsAsync();
-                setPermissions(response);
-            }
-
-            askAsync();
-        }, []);
-
-        return [permissions];
-    }
-
-    const ALBUM_NAME = "My Album";
-    const [permission] = useMediaLibraryPermissions();
-    const takePicture = async () => {
-        if (camera) {
-            const photo = await camera.takePictureAsync();
-            //add to album
-            if (!permission) return null;
-            saveImageToAlbum(photo);
-            setNewPhoto(true);
-        }
+    const toggleShowEffect = () => {
+        setShowEffect(!showEffect);
+        setShowMoreOptions(false);
     };
 
-    const handleMountError = ({ message }) => console.error(message);
-
+    // face detection
     const handleOnFacesDetected = ({ faces }) => {
-        console.log("hello");
-        console.log(faces);
         setFaces(faces);
     };
-    console.log(faces);
     function renderFace({ bounds, faceID, rollAngle, yawAngle, smilingProbability, leftEarPosition }) {
         return (
             <View
@@ -190,12 +227,13 @@ export default function CameraScreen({ navigation }) {
         </View>
     );
 
+    // mini component
     const renderNoPermissions = () => (
         <View style={styles.noPermissions}>
-            {cameraProps.permissionsGranted && (
+            {!permissionGranted && (
                 <View>
                     <Text style={{ color: "#4630ec", fontWeight: "bold", textAlign: "center", fontSize: 24 }}>
-                        Permission {cameraProps.permissionsGranted.toLowerCase()}!
+                        Permission {permissionGranted.toLowerCase()}!
                     </Text>
                     <Text style={{ color: "#595959", textAlign: "center", fontSize: 20 }}>
                         You'll need to enable the camera permission to continue.
@@ -218,12 +256,10 @@ export default function CameraScreen({ navigation }) {
                 />
             </TouchableOpacity>
             <TouchableOpacity style={styles.toggleButton} onPress={toggleWB}>
-                <MaterialIcons name={wbIcons[cameraProps.whiteBalance]} size={32} color="white" />
+                <MaterialIcons name={wbIcons[whiteBalance]} size={32} color="white" />
             </TouchableOpacity>
             <TouchableOpacity style={styles.toggleButton} onPress={toggleFocus}>
-                <Text style={[styles.autoFocusLabel, { color: cameraProps.autoFocus === "on" ? "white" : "#6b6b6b" }]}>
-                    AF
-                </Text>
+                <Text style={[styles.autoFocusLabel, { color: autoFocus === "on" ? "white" : "#6b6b6b" }]}>AF</Text>
             </TouchableOpacity>
         </View>
     );
@@ -258,8 +294,8 @@ export default function CameraScreen({ navigation }) {
                         size={32}
                     />
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => {}}>
-                    <Icon name="color-filter-outline" color={cameraProps.colorFilter ? "white" : "#858585"} size={32} />
+                <TouchableOpacity onPress={toggleShowEffect}>
+                    <MaterialIcons name="auto-fix-high" color={showEffect ? "white" : "#858585"} size={32} />
                 </TouchableOpacity>
             </View>
 
@@ -270,7 +306,7 @@ export default function CameraScreen({ navigation }) {
                         <Icon name="arrow-back-outline" size={14} color="#fff" />
                     </TouchableOpacity>
                     <View style={styles.pictureSizeLabel}>
-                        <Text style={{ color: "white" }}>{cameraProps.pictureSize}</Text>
+                        <Text style={{ color: "white" }}>11111</Text>
                     </View>
                     <TouchableOpacity onPress={() => {}} style={{ padding: 6 }}>
                         <Icon name="arrow-forward-outline" size={14} color="#fff" />
@@ -280,54 +316,78 @@ export default function CameraScreen({ navigation }) {
         </View>
     );
 
-    const renderCamera = () => (
-        <View style={{ flex: 1 }}>
-            <Camera
-                ref={(ref) => (camera = ref)}
-                style={styles.camera}
-                type={cameraProps.type}
-                flashMode={flashMode}
-                autoFocus={cameraProps.autoFocus}
-                zoom={cameraProps.zoom}
-                whiteBalance={cameraProps.whiteBalance}
-                pictureSize={cameraProps.pictureSize}
-                onMountError={handleMountError}
-                onFacesDetected={faceDetecting ? handleOnFacesDetected : undefined}
-                faceDetectorSettings={{
-                    tracking: true,
-                }}
-            >
-                {renderTopBar()}
-                {renderBottomBar()}
-            </Camera>
-            {faceDetecting && renderFaces()}
-            {faceDetecting && renderLandmarks()}
-            {cameraProps.showMoreOptions && renderMoreOptions()}
+    return (
+        <View style={styles.container}>
+            {renderTopBar()}
+            <View style={{ flex: 1 }}>
+                <Surface ref={(ref) => (captureImage = ref)} style={styles.surface}>
+                    <Instagram {...effect}>
+                        <Node
+                            blendFunc={{ src: "one", dst: "one minus src alpha" }}
+                            shader={shaders.YFlip}
+                            uniforms={{
+                                t: () => camera,
+                            }}
+                        >
+                            <Camera
+                                ref={onCameraRef}
+                                style={styles.camera}
+                                type={type}
+                                flashMode={flashMode}
+                                autoFocus={autoFocus}
+                                whiteBalance={whiteBalance}
+                                onMountError={handleMountError}
+                                onFacesDetected={faceDetecting ? handleOnFacesDetected : undefined}
+                                faceDetectorSettings={{
+                                    tracking: true,
+                                }}
+                            />
+                        </Node>
+                    </Instagram>
+                </Surface>
+
+                {faceDetecting && renderFaces()}
+                {faceDetecting && renderLandmarks()}
+                {showMoreOptions && renderMoreOptions()}
+            </View>
+            {showEffect && (
+                <View style={{ height: 80, marginBottom: 10 }}>
+                    <EffectList effectState={effect} changeEffect={changeEffect} onResetEffect={onResetEffect} />
+                </View>
+            )}
+            {renderBottomBar()}
+            {/* const cameraScreenContent = cameraProps.permissionsGranted ? renderCamera() : renderNoPermissions(); */}
         </View>
     );
-
-    const cameraScreenContent = cameraProps.permissionsGranted ? renderCamera() : renderNoPermissions();
-    return <View style={styles.container}>{cameraScreenContent}</View>;
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#000",
+        position: "relative",
+    },
+    surface: {
+        width: 380,
+        height: 580,
     },
     camera: {
         flex: 1,
         justifyContent: "space-between",
     },
     topBar: {
-        flex: 0.2,
+        zIndex: 10,
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
         backgroundColor: "transparent",
         flexDirection: "row",
         justifyContent: "space-around",
         // paddingTop: Constants.statusBarHeight,
     },
     bottomBar: {
-        paddingBottom: 5,
+        // paddingBottom: 5,
         backgroundColor: "transparent",
         justifyContent: "space-between",
         flexDirection: "row",
@@ -375,8 +435,8 @@ const styles = StyleSheet.create({
     },
     options: {
         position: "absolute",
-        bottom: 80,
-        left: 30,
+        bottom: 20,
+        left: 10,
         width: 200,
         height: 160,
         backgroundColor: "#000000BA",

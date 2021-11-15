@@ -39,6 +39,7 @@ import FilterComponent from "../components/Filter";
 import { saveImageToAlbum } from "../helpers/Library";
 import Instagram from "../filters/Instargram";
 import CropList from "../components/CropList";
+import defaultEffect from "../constants/defaultEffect";
 
 const renderTopBar = ({ navigation, saveImage }) => (
     <View style={styles.topBar}>
@@ -51,7 +52,15 @@ const renderTopBar = ({ navigation, saveImage }) => (
     </View>
 );
 
-const renderBottomBar = ({ texture, currentImage, changeFilter, effectState, changeEffect, changeManipulator }) => {
+const renderBottomBar = ({
+    texture,
+    currentImage,
+    changeFilter,
+    effectState,
+    changeEffect,
+    changeManipulator,
+    onResetEffect,
+}) => {
     const [showFilter, setShowFilter] = useState(false);
     const [showEffect, setShowEffect] = useState(false);
     const [showCrop, setShowCrop] = useState(false);
@@ -77,7 +86,12 @@ const renderBottomBar = ({ texture, currentImage, changeFilter, effectState, cha
             <View style={styles.tabView}>
                 {showFilter && <FilterList texture={texture} changeFilter={changeFilter} />}
                 {showEffect && (
-                    <EffectList changeFilter={changeFilter} effectState={effectState} changeEffect={changeEffect} />
+                    <EffectList
+                        changeFilter={changeFilter}
+                        effectState={effectState}
+                        changeEffect={changeEffect}
+                        onResetEffect={onResetEffect}
+                    />
                 )}
                 {showCrop && (
                     <CropList
@@ -121,14 +135,26 @@ function EditScreen({ route, navigation }) {
         setFilter(filterStr);
     };
     const [effect, setEffect] = useState({
-        saturation: 1,
-        brightness: 1,
-        contrast: 1,
-        hue: 0,
-        sepia: 0,
-        gray: 0,
-        mixFactor: 0,
+        saturation: defaultEffect.saturation,
+        brightness: defaultEffect.brightness,
+        contrast: defaultEffect.contrast,
+        hue: defaultEffect.hue,
+        sepia: defaultEffect.sepia,
+        gray: defaultEffect.gray,
+        mixFactor: defaultEffect.mixFactor,
     });
+    const onResetEffect = () => {
+        setEffect({
+            saturation: defaultEffect.saturation,
+            brightness: defaultEffect.brightness,
+            contrast: defaultEffect.contrast,
+            hue: defaultEffect.hue,
+            sepia: defaultEffect.sepia,
+            gray: defaultEffect.gray,
+            mixFactor: defaultEffect.mixFactor,
+        });
+    };
+
     const changeEffect = (name, value) => {
         setEffect((prevState) => ({
             ...prevState,
@@ -164,7 +190,6 @@ function EditScreen({ route, navigation }) {
     };
 
     // get template image when filter
-    console.log("t", currentImg);
     useEffect(() => {
         const currentImage = async () => {
             if (!captureImage) return;
@@ -176,7 +201,6 @@ function EditScreen({ route, navigation }) {
     const changeManipulator = (img) => {
         setCurrentImg(img);
     };
-    console.log(currentImg);
 
     return (
         <View style={styles.container}>
@@ -256,6 +280,7 @@ function EditScreen({ route, navigation }) {
                 effectState: effect,
                 changeEffect,
                 changeManipulator,
+                onResetEffect,
             })}
         </View>
     );

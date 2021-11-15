@@ -1,7 +1,6 @@
 import { Surface } from "gl-react-expo";
 import React from "react";
 import { Image, ScrollView, Text, TouchableOpacity } from "react-native";
-import GLImage from "gl-react-image";
 import "webgltexture-loader-expo-camera";
 
 import Temperature from "../filters/Temperature";
