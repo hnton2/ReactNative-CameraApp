@@ -12,6 +12,10 @@ import { Surface } from "gl-react-expo";
 import Instagram from "../filters/Instargram";
 import EffectList from "../components/EffectList";
 import { saveImageToAlbum } from "../helpers/Library";
+import { FaceDetectorLandmarks, FaceDetectorMode, FaceDetectorClassifications } from "expo-face-detector";
+import Blur from "../filters/Blur";
+import Sharpen from "../filters/Sharpen";
+import Temperature from "../filters/Temperature";
 
 const shaders = Shaders.create({
     YFlip: {
@@ -64,6 +68,9 @@ export default function CameraScreen({ navigation }) {
         hue: defaultEffect.hue,
         sepia: defaultEffect.sepia,
         gray: defaultEffect.gray,
+        temperature: defaultEffect.temperature,
+        sharpen: defaultEffect.sharpen,
+        blur: defaultEffect.blur,
         mixFactor: defaultEffect.mixFactor,
     });
     const [raf, setRaf] = useState(null);
@@ -299,7 +306,7 @@ export default function CameraScreen({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.pictureSizeContainer}>
+            {/* <View style={styles.pictureSizeContainer}>
                 <Text style={styles.pictureQualityLabel}>Picture quality</Text>
                 <View style={styles.pictureSizeChooser}>
                     <TouchableOpacity onPress={() => {}} style={{ padding: 6 }}>
@@ -312,9 +319,11 @@ export default function CameraScreen({ navigation }) {
                         <Icon name="arrow-forward-outline" size={14} color="#fff" />
                     </TouchableOpacity>
                 </View>
-            </View>
+            </View> */}
         </View>
     );
+
+    // console.log(faces);
 
     return (
         <View style={styles.container}>
@@ -322,27 +331,33 @@ export default function CameraScreen({ navigation }) {
             <View style={{ flex: 1 }}>
                 <Surface ref={(ref) => (captureImage = ref)} style={styles.surface}>
                     <Instagram {...effect}>
-                        <Node
-                            blendFunc={{ src: "one", dst: "one minus src alpha" }}
-                            shader={shaders.YFlip}
-                            uniforms={{
-                                t: () => camera,
-                            }}
-                        >
-                            <Camera
-                                ref={onCameraRef}
-                                style={styles.camera}
-                                type={type}
-                                flashMode={flashMode}
-                                autoFocus={autoFocus}
-                                whiteBalance={whiteBalance}
-                                onMountError={handleMountError}
-                                onFacesDetected={faceDetecting ? handleOnFacesDetected : undefined}
-                                faceDetectorSettings={{
-                                    tracking: true,
-                                }}
-                            />
-                        </Node>
+                        <Blur factor={effect.blur}>
+                            <Sharpen factor={effect.sharpen}>
+                                <Temperature factor={effect.temperature}>
+                                    <Node
+                                        blendFunc={{ src: "one", dst: "one minus src alpha" }}
+                                        shader={shaders.YFlip}
+                                        uniforms={{
+                                            t: () => camera,
+                                        }}
+                                    >
+                                        <Camera
+                                            ref={onCameraRef}
+                                            style={styles.camera}
+                                            type={type}
+                                            flashMode={flashMode}
+                                            autoFocus={autoFocus}
+                                            whiteBalance={whiteBalance}
+                                            onMountError={handleMountError}
+                                            onFacesDetected={faceDetecting ? handleOnFacesDetected : undefined}
+                                            faceDetectorSettings={{
+                                                tracking: true,
+                                            }}
+                                        />
+                                    </Node>
+                                </Temperature>
+                            </Sharpen>
+                        </Blur>
                     </Instagram>
                 </Surface>
 
@@ -438,7 +453,7 @@ const styles = StyleSheet.create({
         bottom: 20,
         left: 10,
         width: 200,
-        height: 160,
+        height: 80,
         backgroundColor: "#000000BA",
         borderRadius: 4,
         padding: 10,

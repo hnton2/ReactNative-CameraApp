@@ -1,91 +1,73 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View, ScrollView, ActivityIndicator } from "react-native";
 import * as FileSystem from "expo-file-system";
 import * as ImageManipulator from "expo-image-manipulator";
-import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-import Icon from "react-native-vector-icons/Ionicons";
-import FilterList from "../components/FilterList";
-import EffectList from "../components/EffectList";
 import { Surface } from "gl-react-expo";
+import React, { useEffect, useState } from "react";
+import { ActivityIndicator, Dimensions, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import "webgltexture-loader-expo-camera";
+import CropList from "../components/CropList";
+import EffectList from "../components/EffectList";
+import FilterComponent from "../components/Filter";
+import FilterList from "../components/FilterList";
+import defaultEffect from "../constants/defaultEffect";
 import filterType from "../constants/filterType";
-
-import Temperature from "../filters/Temperature";
-import Hue from "../filters/Hue";
-import Negative from "../filters/Negative";
-import Sepia from "../filters/Sepia";
-import Sharpen from "../filters/Sharpen";
-import Saturate from "../filters/Saturate";
-
 import Amaro from "../filters/Amaro";
 import Brannan from "../filters/Brannan";
 import Earlybird from "../filters/Earlybird";
 import F1977 from "../filters/F1977";
 import Hefe from "../filters/Hefe";
 import Hudson from "../filters/Hudson";
+import Hue from "../filters/Hue";
 import Inkwell from "../filters/Inkwell";
+import Instagram from "../filters/Instargram";
 import Lokofi from "../filters/Lokofi";
 import LordKelvin from "../filters/LordKelvin";
 import Nashville from "../filters/Nashville";
+import Negative from "../filters/Negative";
 import Normal from "../filters/Normal";
 import Rise from "../filters/Rise";
+import Saturate from "../filters/Saturate";
+import Sepia from "../filters/Sepia";
+import Sharpen from "../filters/Sharpen";
 import Sierra from "../filters/Sierra";
 import Sutro from "../filters/Sutro";
+import Temperature from "../filters/Temperature";
 import Toaster from "../filters/Toaster";
 import Valencia from "../filters/Valencia";
 import Walden from "../filters/Walden";
 import XproII from "../filters/XproII";
-import FilterComponent from "../components/Filter";
-import { saveImageToAlbum } from "../helpers/Library";
-import Instagram from "../filters/Instargram";
-import CropList from "../components/CropList";
-import defaultEffect from "../constants/defaultEffect";
+import Colorify from "../filters/ColorScale";
 
-const renderTopBar = ({ navigation, saveImage }) => (
+import { saveImageToAlbum } from "../helpers/Library";
+import Blur from "../filters/Blur";
+
+const { width, height } = Dimensions.get("window");
+const FILTER = "FILTER",
+    EFFECT = "EFFECT",
+    CROP = "CROP";
+
+const renderTopBar = ({ navigation, savePhoto }) => (
     <View style={styles.topBar}>
         <TouchableOpacity style={styles.toggleButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.whiteText}>Cancel</Text>
+            <Text style={styles.whiteText}>
+                <MaterialIcons name="arrow-back" color="white" type="material" size={24} />
+            </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.toggleButton} onPress={saveImage}>
+        <TouchableOpacity style={styles.toggleButton} onPress={savePhoto}>
             <Text style={styles.whiteText}>Save</Text>
         </TouchableOpacity>
     </View>
 );
 
-const renderBottomBar = ({
-    texture,
-    currentImage,
-    changeFilter,
-    effectState,
-    changeEffect,
-    changeManipulator,
-    onResetEffect,
-}) => {
-    const [showFilter, setShowFilter] = useState(false);
-    const [showEffect, setShowEffect] = useState(false);
-    const [showCrop, setShowCrop] = useState(false);
-
-    const handleShowFilter = () => {
-        setShowFilter(!showFilter);
-        setShowCrop(false);
-        setShowEffect(false);
-    };
-    const handleShowEffect = () => {
-        setShowEffect(!showEffect);
-        setShowFilter(false);
-        setShowCrop(false);
-    };
-    const handleShowCrop = () => {
-        setShowCrop(!showCrop);
-        setShowFilter(false);
-        setShowEffect(false);
-    };
+const renderBottomBar = ({ photo, changeFilter, effectState, changeEffect, onResetEffect }) => {
+    const [type, setType] = useState("");
 
     return (
         <View style={styles.bottomBar}>
             <View style={styles.tabView}>
-                {showFilter && <FilterList texture={texture} changeFilter={changeFilter} />}
-                {showEffect && (
+                {type === FILTER && <FilterList photo={photo} changeFilter={changeFilter} />}
+                {type === EFFECT && (
                     <EffectList
                         changeFilter={changeFilter}
                         effectState={effectState}
@@ -93,32 +75,26 @@ const renderBottomBar = ({
                         onResetEffect={onResetEffect}
                     />
                 )}
-                {showCrop && (
-                    <CropList
-                        changeFilter={changeFilter}
-                        currentImage={currentImage}
-                        changeManipulator={changeManipulator}
-                    />
-                )}
+                {type === CROP && <CropList photo={photo} />}
             </View>
 
             <View style={styles.tab}>
-                <TouchableOpacity style={styles.bottomButton} onPress={handleShowFilter}>
-                    <Icon name="color-filter-outline" color={showFilter ? "white" : "#858585"} size={25} />
-                    <Text style={showFilter ? styles.tabTitleActive : styles.tabTitle}>Filter</Text>
+                <TouchableOpacity style={styles.bottomButton} onPress={() => setType(FILTER)}>
+                    <Icon name="color-filter-outline" color={type === FILTER ? "white" : "#858585"} size={25} />
+                    <Text style={type === FILTER ? styles.tabTitleActive : styles.tabTitle}>{FILTER}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton} onPress={handleShowEffect}>
+                <TouchableOpacity style={styles.bottomButton} onPress={() => setType(EFFECT)}>
                     <MaterialIcons
                         name="auto-fix-high"
-                        color={showEffect ? "white" : "#858585"}
+                        color={type === EFFECT ? "white" : "#858585"}
                         type="material"
                         size={25}
                     />
-                    <Text style={showEffect ? styles.tabTitleActive : styles.tabTitle}>Effect</Text>
+                    <Text style={type === EFFECT ? styles.tabTitleActive : styles.tabTitle}>{EFFECT}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton} onPress={handleShowCrop}>
-                    <MaterialIcons name="crop" color={showCrop ? "white" : "#858585"} type="material" size={25} />
-                    <Text style={showCrop ? styles.tabTitleActive : styles.tabTitle}>Crop</Text>
+                <TouchableOpacity style={styles.bottomButton} onPress={() => setType(CROP)}>
+                    <MaterialIcons name="crop" color={type === CROP ? "white" : "#858585"} type="material" size={25} />
+                    <Text style={type === CROP ? styles.tabTitleActive : styles.tabTitle}>{CROP}</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -126,10 +102,36 @@ const renderBottomBar = ({
 };
 
 function EditScreen({ route, navigation }) {
-    let captureImage;
-    const { photo } = route.params;
-    const [texture, setTexture] = useState(null);
-    const [currentImg, setCurrentImg] = useState(null);
+    let capturePhoto;
+
+    const { originalPhoto } = route.params;
+    console.log(originalPhoto);
+    const [photo, setPhoto] = useState(null);
+    const [currentPhoto, setCurrentPhoto] = useState(null);
+    // format image for filter
+    useEffect(() => {
+        const loadAsync = async () => {
+            await FileSystem.copyAsync({
+                from: `${originalPhoto.uri}/${originalPhoto.filename}`,
+                to: FileSystem.documentDirectory + originalPhoto.filename,
+            });
+
+            const imageResult = await ImageManipulator.manipulateAsync(
+                FileSystem.documentDirectory + originalPhoto.filename,
+                [{ resize: { width: 345 } }],
+                { compress: 1, format: "png" }
+            );
+            setPhoto(imageResult);
+            setCurrentPhoto(imageResult);
+        };
+        loadAsync();
+    }, []);
+    console.log(photo);
+
+    // Type of edit
+    const [type, setType] = useState("");
+    const toggleModal = () => setType("");
+
     const [filter, setFilter] = useState(filterType.Normal);
     const changeFilter = (filterStr) => {
         setFilter(filterStr);
@@ -141,19 +143,11 @@ function EditScreen({ route, navigation }) {
         hue: defaultEffect.hue,
         sepia: defaultEffect.sepia,
         gray: defaultEffect.gray,
+        temperature: defaultEffect.temperature,
+        sharpen: defaultEffect.sharpen,
+        blur: defaultEffect.blur,
         mixFactor: defaultEffect.mixFactor,
     });
-    const onResetEffect = () => {
-        setEffect({
-            saturation: defaultEffect.saturation,
-            brightness: defaultEffect.brightness,
-            contrast: defaultEffect.contrast,
-            hue: defaultEffect.hue,
-            sepia: defaultEffect.sepia,
-            gray: defaultEffect.gray,
-            mixFactor: defaultEffect.mixFactor,
-        });
-    };
 
     const changeEffect = (name, value) => {
         setEffect((prevState) => ({
@@ -162,110 +156,90 @@ function EditScreen({ route, navigation }) {
         }));
     };
 
-    // format image for filter
-    useEffect(() => {
-        const loadAsync = async () => {
-            await FileSystem.copyAsync({
-                from: `${photo.uri}/${photo.filename}`,
-                to: FileSystem.documentDirectory + photo.filename,
-            });
+    const savePhoto = async () => {
+        if (!capturePhoto) return;
 
-            const imageResult = await ImageManipulator.manipulateAsync(
-                FileSystem.documentDirectory + photo.filename,
-                [{ resize: { width: 300 } }],
-                { compress: 1, format: "png" }
-            );
-            setTexture(imageResult);
-            setCurrentImg(imageResult);
-        };
-        loadAsync();
-    }, []);
-
-    const saveImage = async () => {
-        if (!captureImage) return;
-
-        const result = await captureImage.glView.capture();
+        const result = await capturePhoto.glView.capture();
         await saveImageToAlbum(result);
         navigation.goBack();
     };
 
-    // get template image when filter
+    // get template image when edit
     useEffect(() => {
-        const currentImage = async () => {
-            if (!captureImage) return;
-            const result = await captureImage.glView.capture();
-            setCurrentImg(result);
+        const getCurrentPhoto = async () => {
+            if (!capturePhoto) return;
+            const result = await capturePhoto.glView.capture();
+            setCurrentPhoto(result);
         };
-        currentImage();
+        getCurrentPhoto();
     }, [filter]);
-    const changeManipulator = (img) => {
-        setCurrentImg(img);
+    const changeCurrentPhoto = (p) => {
+        setCurrentPhoto(p);
     };
 
     return (
         <View style={styles.container}>
-            {renderTopBar({ navigation, saveImage })}
+            {renderTopBar({ navigation, savePhoto })}
             <View style={styles.main}>
-                {texture ? (
-                    <Surface
-                        style={{ width: texture.width, height: texture.height }}
-                        ref={(ref) => (captureImage = ref)}
-                    >
-                        {filter === filterType.Amaro && <FilterComponent component={Amaro} photoUri={texture.uri} />}
-                        {filter === filterType.Brannan && (
-                            <FilterComponent component={Brannan} photoUri={texture.uri} />
-                        )}
+                {photo ? (
+                    <Surface style={{ width: photo.width, height: photo.height }} ref={(ref) => (capturePhoto = ref)}>
+                        {filter === filterType.Amaro && <FilterComponent component={Amaro} photoUri={photo.uri} />}
+                        {filter === filterType.Brannan && <FilterComponent component={Brannan} photoUri={photo.uri} />}
                         {filter === filterType.Earlybird && (
-                            <FilterComponent component={Earlybird} photoUri={texture.uri} />
+                            <FilterComponent component={Earlybird} photoUri={photo.uri} />
                         )}
-                        {filter === filterType.F1977 && <FilterComponent component={F1977} photoUri={texture.uri} />}
-                        {filter === filterType.Hefe && <FilterComponent component={Hefe} photoUri={texture.uri} />}
-                        {filter === filterType.Hudson && <FilterComponent component={Hudson} photoUri={texture.uri} />}
-                        {filter === filterType.Inkwell && (
-                            <FilterComponent component={Inkwell} photoUri={texture.uri} />
-                        )}
-                        {filter === filterType.Lokofi && <FilterComponent component={Lokofi} photoUri={texture.uri} />}
+                        {filter === filterType.F1977 && <FilterComponent component={F1977} photoUri={photo.uri} />}
+                        {filter === filterType.Hefe && <FilterComponent component={Hefe} photoUri={photo.uri} />}
+                        {filter === filterType.Hudson && <FilterComponent component={Hudson} photoUri={photo.uri} />}
+                        {filter === filterType.Inkwell && <FilterComponent component={Inkwell} photoUri={photo.uri} />}
+                        {filter === filterType.Lokofi && <FilterComponent component={Lokofi} photoUri={photo.uri} />}
                         {filter === filterType.LordKelvin && (
-                            <FilterComponent component={LordKelvin} photoUri={texture.uri} />
+                            <FilterComponent component={LordKelvin} photoUri={photo.uri} />
                         )}
                         {filter === filterType.Nashville && (
-                            <FilterComponent component={Nashville} photoUri={texture.uri} />
+                            <FilterComponent component={Nashville} photoUri={photo.uri} />
                         )}
-                        {filter === filterType.Normal && <FilterComponent component={Normal} photoUri={texture.uri} />}
-                        {filter === filterType.Rise && <FilterComponent component={Rise} photoUri={texture.uri} />}
-                        {filter === filterType.Sierra && <FilterComponent component={Sierra} photoUri={texture.uri} />}
-                        {filter === filterType.Sutro && <FilterComponent component={Sutro} photoUri={texture.uri} />}
-                        {filter === filterType.Toaster && (
-                            <FilterComponent component={Toaster} photoUri={texture.uri} />
-                        )}
+                        {filter === filterType.Normal && <FilterComponent component={Normal} photoUri={photo.uri} />}
+                        {filter === filterType.Rise && <FilterComponent component={Rise} photoUri={photo.uri} />}
+                        {filter === filterType.Sierra && <FilterComponent component={Sierra} photoUri={photo.uri} />}
+                        {filter === filterType.Sutro && <FilterComponent component={Sutro} photoUri={photo.uri} />}
+                        {filter === filterType.Toaster && <FilterComponent component={Toaster} photoUri={photo.uri} />}
                         {filter === filterType.Valencia && (
-                            <FilterComponent component={Valencia} photoUri={texture.uri} />
+                            <FilterComponent component={Valencia} photoUri={photo.uri} />
                         )}
-                        {filter === filterType.Walden && <FilterComponent component={Walden} photoUri={texture.uri} />}
-                        {filter === filterType.XproII && <FilterComponent component={XproII} photoUri={texture.uri} />}
+                        {filter === filterType.Walden && <FilterComponent component={Walden} photoUri={photo.uri} />}
+                        {filter === filterType.XproII && <FilterComponent component={XproII} photoUri={photo.uri} />}
                         {filter === filterType.Temperature && (
-                            <FilterComponent component={Temperature} factor={6300} photoUri={texture.uri} />
+                            <FilterComponent component={Temperature} factor={6300} photoUri={photo.uri} />
                         )}
                         {filter === filterType.Hue && (
-                            <FilterComponent component={Hue} factor={2} photoUri={texture.uri} />
+                            <FilterComponent component={Hue} factor={2} photoUri={photo.uri} />
                         )}
                         {filter === filterType.Negative && (
-                            <FilterComponent component={Negative} factor={0.25} photoUri={texture.uri} />
+                            <FilterComponent component={Negative} factor={0.25} photoUri={photo.uri} />
                         )}
                         {filter === filterType.Sharpen && (
-                            <FilterComponent component={Sharpen} factor={0.25} photoUri={texture.uri} />
+                            <FilterComponent component={Sharpen} factor={0.25} photoUri={photo.uri} />
                         )}
                         {filter === filterType.Saturate && (
-                            <FilterComponent component={Saturate} factor={2} photoUri={texture.uri} />
+                            <FilterComponent component={Saturate} factor={2} photoUri={photo.uri} />
                         )}
                         {filter === filterType.Sepia && (
-                            <FilterComponent component={Sepia} factor={1.5} photoUri={texture.uri} />
+                            <FilterComponent component={Sepia} factor={1.5} photoUri={photo.uri} />
                         )}
                         {filter === "effectMode" && (
-                            <FilterComponent component={Instagram} {...effect} photoUri={texture.uri} />
+                            <Instagram {...effect}>
+                                <Blur factor={effect.blur}>
+                                    <Sharpen factor={effect.sharpen} width={photo.width} height={photo.height}>
+                                        <Temperature factor={effect.temperature}>
+                                            {{ uri: currentPhoto.uri }}
+                                        </Temperature>
+                                    </Sharpen>
+                                </Blur>
+                            </Instagram>
                         )}
                         {/* cropMode image when choose filter or effect */}
-                        {filter === "cropMode" && <FilterComponent component={Normal} photoUri={currentImg.uri} />}
+                        {/* {filter === "cropMode" && <FilterComponent component={Normal} photoUri={currentImg.uri} />} */}
                     </Surface>
                 ) : (
                     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
@@ -273,15 +247,44 @@ function EditScreen({ route, navigation }) {
                     </View>
                 )}
             </View>
-            {renderBottomBar({
-                texture: texture,
-                currentImage: currentImg,
-                changeFilter,
-                effectState: effect,
-                changeEffect,
-                changeManipulator,
-                onResetEffect,
-            })}
+
+            {/* Bottom bar */}
+            <View style={styles.bottomBar}>
+                <View style={styles.tabView}>
+                    {type === FILTER && <FilterList photo={photo} changeFilter={changeFilter} />}
+                    {type === EFFECT && (
+                        <EffectList changeFilter={changeFilter} effectState={effect} changeEffect={changeEffect} />
+                    )}
+                    {type === CROP && (
+                        <CropList photo={currentPhoto} toggleModal={toggleModal} changePhoto={changeCurrentPhoto} />
+                    )}
+                </View>
+
+                <View style={styles.tab}>
+                    <TouchableOpacity style={styles.bottomButton} onPress={() => setType(FILTER)}>
+                        <Icon name="color-filter-outline" color={type === FILTER ? "white" : "#858585"} size={25} />
+                        <Text style={type === FILTER ? styles.tabTitleActive : styles.tabTitle}>{FILTER}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.bottomButton} onPress={() => setType(EFFECT)}>
+                        <MaterialIcons
+                            name="auto-fix-high"
+                            color={type === EFFECT ? "white" : "#858585"}
+                            type="material"
+                            size={25}
+                        />
+                        <Text style={type === EFFECT ? styles.tabTitleActive : styles.tabTitle}>{EFFECT}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.bottomButton} onPress={() => setType(CROP)}>
+                        <MaterialIcons
+                            name="crop"
+                            color={type === CROP ? "white" : "#858585"}
+                            type="material"
+                            size={25}
+                        />
+                        <Text style={type === CROP ? styles.tabTitleActive : styles.tabTitle}>{CROP}</Text>
+                    </TouchableOpacity>
+                </View>
+            </View>
         </View>
     );
 }
@@ -348,11 +351,11 @@ const styles = StyleSheet.create({
     },
     tabTitle: {
         color: "#858585",
-        fontSize: 13,
+        fontSize: 11,
     },
     tabTitleActive: {
         color: "#fff",
-        fontSize: 13,
+        fontSize: 11,
         fontWeight: "bold",
     },
     tabView: {

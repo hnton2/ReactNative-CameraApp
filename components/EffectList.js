@@ -1,14 +1,13 @@
+import Slider from "@react-native-community/slider";
 import React, { useState } from "react";
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import "webgltexture-loader-expo-camera";
+import defaultEffect from "../constants/defaultEffect";
 import FSlider from "./FSlider";
 
-function EffectList({ changeFilter, effectState, changeEffect, onResetEffect }) {
+function EffectList({ changeFilter, effectState, changeEffect }) {
     const [effect, setEffect] = useState(null);
-    const handleEffect = (str) => {
-        if (str === effect) setEffect(null);
-        else setEffect(str);
-    };
+    const handleEffect = (str) => (str === effect ? setEffect(null) : setEffect(str));
 
     // Value slider change
     const _onChange = (value) => {
@@ -21,7 +20,7 @@ function EffectList({ changeFilter, effectState, changeEffect, onResetEffect }) 
     };
 
     const _onReset = () => {
-        onResetEffect(effect);
+        changeEffect(effect, defaultEffect[effect]);
     };
 
     return (
@@ -92,6 +91,39 @@ function EffectList({ changeFilter, effectState, changeEffect, onResetEffect }) 
                     onHidden={_onHidden}
                 />
             )}
+            {effect === "temperature" && (
+                <FSlider
+                    name="temperature"
+                    value={effectState.temperature}
+                    min={0}
+                    max={3000}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
+            )}
+            {effect === "sharpen" && (
+                <FSlider
+                    name="sharpen"
+                    value={effectState.sharpen}
+                    min={0}
+                    max={3}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
+            )}
+            {effect === "blur" && (
+                <FSlider
+                    name="blur"
+                    value={effectState.blur}
+                    min={0}
+                    max={5}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
+            )}
             {effect === "mixFactor" && (
                 <FSlider
                     name="mixFactor"
@@ -133,6 +165,21 @@ function EffectList({ changeFilter, effectState, changeEffect, onResetEffect }) 
                     <View style={styles.box}>
                         <TouchableOpacity onPress={() => handleEffect("gray")}>
                             <Text style={styles.textBox}>Gray</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.box}>
+                        <TouchableOpacity onPress={() => handleEffect("temperature")}>
+                            <Text style={styles.textBox}>Temperature</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.box}>
+                        <TouchableOpacity onPress={() => handleEffect("sharpen")}>
+                            <Text style={styles.textBox}>Sharpen</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.box}>
+                        <TouchableOpacity onPress={() => handleEffect("blur")}>
+                            <Text style={styles.textBox}>Blur</Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.box}>

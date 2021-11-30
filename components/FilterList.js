@@ -1,34 +1,32 @@
 import { Surface } from "gl-react-expo";
 import React from "react";
-import { Image, ScrollView, Text, TouchableOpacity } from "react-native";
+import { ScrollView, Text, TouchableOpacity } from "react-native";
 import "webgltexture-loader-expo-camera";
-
-import Temperature from "../filters/Temperature";
-import Hue from "../filters/Hue";
-import Negative from "../filters/Negative";
-import Sepia from "../filters/Sepia";
-import Sharpen from "../filters/Sharpen";
-import Saturate from "../filters/Saturate";
-
+import filterType from "../constants/filterType";
 import Amaro from "../filters/Amaro";
 import Brannan from "../filters/Brannan";
 import Earlybird from "../filters/Earlybird";
 import F1977 from "../filters/F1977";
 import Hefe from "../filters/Hefe";
 import Hudson from "../filters/Hudson";
+import Hue from "../filters/Hue";
 import Inkwell from "../filters/Inkwell";
 import Lokofi from "../filters/Lokofi";
 import LordKelvin from "../filters/LordKelvin";
 import Nashville from "../filters/Nashville";
+import Negative from "../filters/Negative";
 import Normal from "../filters/Normal";
 import Rise from "../filters/Rise";
+import Saturate from "../filters/Saturate";
+import Sepia from "../filters/Sepia";
+import Sharpen from "../filters/Sharpen";
 import Sierra from "../filters/Sierra";
 import Sutro from "../filters/Sutro";
+import Temperature from "../filters/Temperature";
 import Toaster from "../filters/Toaster";
 import Valencia from "../filters/Valencia";
 import Walden from "../filters/Walden";
 import XproII from "../filters/XproII";
-import filterType from "../constants/filterType";
 import FilterComponent from "./Filter";
 
 function FilterButton({ component, name, uri, changeFilter, factor = 1 }) {
@@ -42,89 +40,89 @@ function FilterButton({ component, name, uri, changeFilter, factor = 1 }) {
     );
 }
 
-function FilterList({ texture, changeFilter }) {
+function FilterList({ photo, changeFilter }) {
     return (
         <ScrollView style={{ padding: 5 }} horizontal showsHorizontalScrollIndicator={false}>
-            <FilterButton component={Amaro} name={filterType.Amaro} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton component={Brannan} name={filterType.Brannan} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Amaro} name={filterType.Amaro} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Brannan} name={filterType.Brannan} uri={photo.uri} changeFilter={changeFilter} />
             <FilterButton
                 component={Earlybird}
                 name={filterType.Earlybird}
-                uri={texture.uri}
+                uri={photo.uri}
                 changeFilter={changeFilter}
             />
-            <FilterButton component={F1977} name={filterType.F1977} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton component={Hefe} name={filterType.Hefe} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton component={Hudson} name={filterType.Hudson} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton component={Inkwell} name={filterType.Inkwell} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton component={Lokofi} name={filterType.Lokofi} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={F1977} name={filterType.F1977} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Hefe} name={filterType.Hefe} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Hudson} name={filterType.Hudson} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Inkwell} name={filterType.Inkwell} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Lokofi} name={filterType.Lokofi} uri={photo.uri} changeFilter={changeFilter} />
             <FilterButton
                 component={LordKelvin}
                 name={filterType.LordKelvin}
-                uri={texture.uri}
+                uri={photo.uri}
                 changeFilter={changeFilter}
             />
             <FilterButton
                 component={Nashville}
                 name={filterType.Nashville}
-                uri={texture.uri}
+                uri={photo.uri}
                 changeFilter={changeFilter}
             />
-            <FilterButton component={Normal} name={filterType.Normal} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton component={Rise} name={filterType.Rise} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton component={Sierra} name={filterType.Sierra} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton component={Sutro} name={filterType.Sutro} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton component={Toaster} name={filterType.Toaster} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton
-                component={Valencia}
-                name={filterType.Valencia}
-                uri={texture.uri}
-                changeFilter={changeFilter}
-            />
-            <FilterButton component={Walden} name={filterType.Walden} uri={texture.uri} changeFilter={changeFilter} />
-            <FilterButton component={XproII} name={filterType.XproII} uri={texture.uri} changeFilter={changeFilter} />
+            <FilterButton component={Normal} name={filterType.Normal} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Rise} name={filterType.Rise} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Sierra} name={filterType.Sierra} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Sutro} name={filterType.Sutro} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Toaster} name={filterType.Toaster} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Valencia} name={filterType.Valencia} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={Walden} name={filterType.Walden} uri={photo.uri} changeFilter={changeFilter} />
+            <FilterButton component={XproII} name={filterType.XproII} uri={photo.uri} changeFilter={changeFilter} />
             <FilterButton
                 component={Temperature}
                 name={filterType.Temperature}
-                uri={texture.uri}
+                uri={photo.uri}
                 changeFilter={changeFilter}
                 factor={6300}
             />
             <FilterButton
                 component={Hue}
                 name={filterType.Hue}
-                uri={texture.uri}
+                uri={photo.uri}
                 changeFilter={changeFilter}
                 factor={2}
             />
             <FilterButton
                 component={Negative}
                 name={filterType.Negative}
-                uri={texture.uri}
+                uri={photo.uri}
                 changeFilter={changeFilter}
-                factor={0.25}
+                factor={0.125}
             />
             <FilterButton
                 component={Sharpen}
                 name={filterType.Sharpen}
-                uri={texture.uri}
+                uri={photo.uri}
                 changeFilter={changeFilter}
                 factor={0.25}
             />
             <FilterButton
                 component={Saturate}
                 name={filterType.Saturate}
-                uri={texture.uri}
+                uri={photo.uri}
                 changeFilter={changeFilter}
                 factor={2}
             />
             <FilterButton
                 component={Sepia}
                 name={filterType.Sepia}
-                uri={texture.uri}
+                uri={photo.uri}
                 changeFilter={changeFilter}
                 factor={1.5}
             />
+            {/* <TouchableOpacity>
+                <Surface style={{ height: 80, width: 80 }}>
+                    <Colorify colorScale={colorScale["heatmap"]}>{{ uri: texture.uri }}</Colorify>
+                </Surface>
+            </TouchableOpacity> */}
         </ScrollView>
     );
 }

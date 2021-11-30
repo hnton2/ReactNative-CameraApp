@@ -1,9 +1,8 @@
 import { useIsFocused } from "@react-navigation/core";
 import * as MediaLibrary from "expo-media-library";
 import React, { useEffect, useState } from "react";
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import PhotoScreen from "../components/Photo";
 
 const ALBUM_NAME = "My Album";
 
@@ -29,10 +28,6 @@ export default function GalleryScreen({ navigation }) {
         fetchAlbums().then((albums) => setPhotos(albums.assets));
     }, [isFocused]);
 
-    const editPhoto = (photo) => {
-        return navigation.navigate("Edit", { photo: photo });
-    };
-
     return (
         <View style={styles.container}>
             <View style={styles.navbar}>
@@ -47,7 +42,13 @@ export default function GalleryScreen({ navigation }) {
             <ScrollView>
                 <View style={styles.pictures}>
                     {photos.map((photo, index) => (
-                        <PhotoScreen key={index} photo={photo} editPhoto={editPhoto} />
+                        <TouchableOpacity
+                            style={styles.pictureWrapper}
+                            key={index}
+                            onPress={() => navigation.navigate("Edit", { originalPhoto: photo })}
+                        >
+                            <Image style={styles.picture} source={{ uri: `${photo.uri}/${photo.filename}` }} />
+                        </TouchableOpacity>
                     ))}
                 </View>
             </ScrollView>
@@ -66,12 +67,24 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         backgroundColor: "#4630EB",
     },
+    pictureWrapper: {
+        width: 80,
+        height: 80,
+        alignItems: "center",
+        justifyContent: "center",
+        margin: 1,
+    },
     pictures: {
         flex: 1,
         flexWrap: "wrap",
         flexDirection: "row",
         justifyContent: "space-evenly",
         paddingVertical: 8,
+    },
+    picture: {
+        position: "absolute",
+        width: 80,
+        height: 80,
     },
     button: {
         paddingTop: 20,

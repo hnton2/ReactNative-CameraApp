@@ -11,7 +11,6 @@ const colorScale = {
 
     opacity: ndarray(new Float64Array([0, 1]), [2, 1, 1]).step(-1, 1, 1), // see gl-texture2d rule: https://github.com/stackgl/gl-texture2d#var-tex--createtexturegl-array
 
-    // from https://github.com/gka/chroma.js/blob/master/src/colors/colorbrewer.coffee
     OrRd: ndarray(
         new Float64Array([
             1.0, 0.97, 0.93, 1.0, 0.91, 0.78, 0.99, 0.83, 0.62, 0.99, 0.73, 0.52, 0.99, 0.55, 0.35, 0.94, 0.4, 0.28,

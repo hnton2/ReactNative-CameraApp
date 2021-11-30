@@ -17,5 +17,11 @@ const shaders = Shaders.create({
 });
 
 export default function Colorify({ children: t, colorScale }) {
-    return <Node shader={shaders.colorify} uniforms={{ colorScale, children: t }} />;
+    return (
+        <Node
+            shader={shaders.colorify}
+            uniformsOptions={{ colorScale: "linear" }}
+            uniforms={{ colorScale, children: t }}
+        />
+    );
 }

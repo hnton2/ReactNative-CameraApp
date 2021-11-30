@@ -5,6 +5,9 @@ const defaultEffect = {
     hue: 0,
     sepia: 0,
     gray: 0,
+    temperature: 0,
+    sharpen: 0,
+    blur: 0,
     mixFactor: 0,
 };
 
