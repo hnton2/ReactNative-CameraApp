@@ -60,52 +60,10 @@ const renderTopBar = ({ navigation, savePhoto }) => (
     </View>
 );
 
-const renderBottomBar = ({ photo, changeFilter, effectState, changeEffect, onResetEffect }) => {
-    const [type, setType] = useState("");
-
-    return (
-        <View style={styles.bottomBar}>
-            <View style={styles.tabView}>
-                {type === FILTER && <FilterList photo={photo} changeFilter={changeFilter} />}
-                {type === EFFECT && (
-                    <EffectList
-                        changeFilter={changeFilter}
-                        effectState={effectState}
-                        changeEffect={changeEffect}
-                        onResetEffect={onResetEffect}
-                    />
-                )}
-                {type === CROP && <CropList photo={photo} />}
-            </View>
-
-            <View style={styles.tab}>
-                <TouchableOpacity style={styles.bottomButton} onPress={() => setType(FILTER)}>
-                    <Icon name="color-filter-outline" color={type === FILTER ? "white" : "#858585"} size={25} />
-                    <Text style={type === FILTER ? styles.tabTitleActive : styles.tabTitle}>{FILTER}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton} onPress={() => setType(EFFECT)}>
-                    <MaterialIcons
-                        name="auto-fix-high"
-                        color={type === EFFECT ? "white" : "#858585"}
-                        type="material"
-                        size={25}
-                    />
-                    <Text style={type === EFFECT ? styles.tabTitleActive : styles.tabTitle}>{EFFECT}</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.bottomButton} onPress={() => setType(CROP)}>
-                    <MaterialIcons name="crop" color={type === CROP ? "white" : "#858585"} type="material" size={25} />
-                    <Text style={type === CROP ? styles.tabTitleActive : styles.tabTitle}>{CROP}</Text>
-                </TouchableOpacity>
-            </View>
-        </View>
-    );
-};
-
 function EditScreen({ route, navigation }) {
     let capturePhoto;
 
     const { originalPhoto } = route.params;
-    console.log(originalPhoto);
     const [photo, setPhoto] = useState(null);
     const [currentPhoto, setCurrentPhoto] = useState(null);
     // format image for filter
@@ -115,19 +73,24 @@ function EditScreen({ route, navigation }) {
                 from: `${originalPhoto.uri}/${originalPhoto.filename}`,
                 to: FileSystem.documentDirectory + originalPhoto.filename,
             });
-
-            const imageResult = await ImageManipulator.manipulateAsync(
-                FileSystem.documentDirectory + originalPhoto.filename,
-                [{ resize: { width: 345 } }],
-                { compress: 1, format: "png" }
-            );
-            setPhoto(imageResult);
-            setCurrentPhoto(imageResult);
+            const fileName = FileSystem.documentDirectory + originalPhoto.filename;
+            if (originalPhoto.width > 345) {
+                const imageResult = await ImageManipulator.manipulateAsync(fileName, [{ resize: { width: 345 } }], {
+                    compress: 1,
+                    format: "png",
+                });
+                setPhoto(imageResult);
+                setCurrentPhoto(imageResult);
+            } else {
+                setPhoto({
+                    uri: fileName,
+                    width: originalPhoto.width,
+                    height: originalPhoto.height,
+                });
+            }
         };
         loadAsync();
     }, []);
-    console.log(photo);
-
     // Type of edit
     const [type, setType] = useState("");
     const toggleModal = () => setType("");
@@ -169,10 +132,17 @@ function EditScreen({ route, navigation }) {
         const getCurrentPhoto = async () => {
             if (!capturePhoto) return;
             const result = await capturePhoto.glView.capture();
-            setCurrentPhoto(result);
+            const imageResult = await ImageManipulator.manipulateAsync(result.uri, [{ resize: { width: 345 } }], {
+                compress: 1,
+                format: "png",
+            });
+            setCurrentPhoto(imageResult);
         };
         getCurrentPhoto();
     }, [filter]);
+    const changePhoto = (p) => {
+        setPhoto(p);
+    };
     const changeCurrentPhoto = (p) => {
         setCurrentPhoto(p);
     };
@@ -231,9 +201,7 @@ function EditScreen({ route, navigation }) {
                             <Instagram {...effect}>
                                 <Blur factor={effect.blur}>
                                     <Sharpen factor={effect.sharpen} width={photo.width} height={photo.height}>
-                                        <Temperature factor={effect.temperature}>
-                                            {{ uri: currentPhoto.uri }}
-                                        </Temperature>
+                                        <Temperature factor={effect.temperature}>{{ uri: photo.uri }}</Temperature>
                                     </Sharpen>
                                 </Blur>
                             </Instagram>
@@ -256,7 +224,7 @@ function EditScreen({ route, navigation }) {
                         <EffectList changeFilter={changeFilter} effectState={effect} changeEffect={changeEffect} />
                     )}
                     {type === CROP && (
-                        <CropList photo={currentPhoto} toggleModal={toggleModal} changePhoto={changeCurrentPhoto} />
+                        <CropList photo={currentPhoto} toggleModal={toggleModal} changePhoto={changePhoto} />
                     )}
                 </View>
 

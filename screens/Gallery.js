@@ -36,7 +36,7 @@ export default function GalleryScreen({ navigation }) {
                 </TouchableOpacity>
                 <Text style={styles.whiteText}>Gallery</Text>
                 <TouchableOpacity style={styles.button}>
-                    <Icon name="close-circle-outline" color="#fff" size={25} />
+                    {/* <Icon name="close-circle-outline" color="#fff" size={25} /> */}
                 </TouchableOpacity>
             </View>
             <ScrollView>

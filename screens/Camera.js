@@ -265,8 +265,11 @@ export default function CameraScreen({ navigation }) {
             <TouchableOpacity style={styles.toggleButton} onPress={toggleWB}>
                 <MaterialIcons name={wbIcons[whiteBalance]} size={32} color="white" />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.toggleButton} onPress={toggleFocus}>
+            {/* <TouchableOpacity style={styles.toggleButton} onPress={toggleFocus}>
                 <Text style={[styles.autoFocusLabel, { color: autoFocus === "on" ? "white" : "#6b6b6b" }]}>AF</Text>
+            </TouchableOpacity> */}
+            <TouchableOpacity style={styles.toggleButton} onPress={toggleShowEffect}>
+                <MaterialIcons name="auto-fix-high" color={showEffect ? "white" : "#858585"} size={32} />
             </TouchableOpacity>
         </View>
     );
@@ -274,7 +277,7 @@ export default function CameraScreen({ navigation }) {
     const renderBottomBar = () => (
         <View style={styles.bottomBar}>
             <TouchableOpacity style={styles.bottomButton} onPress={toggleMoreOptions}>
-                <Icon name="options-outline" color="#fff" size={30} />
+                {/* <Icon name="options-outline" color="#fff" size={30} /> */}
             </TouchableOpacity>
             <View style={{ flex: 0.4 }}>
                 <TouchableOpacity onPress={takePicture} style={{ alignSelf: "center" }}>
@@ -363,7 +366,7 @@ export default function CameraScreen({ navigation }) {
 
                 {faceDetecting && renderFaces()}
                 {faceDetecting && renderLandmarks()}
-                {showMoreOptions && renderMoreOptions()}
+                {/* {showMoreOptions && renderMoreOptions()} */}
             </View>
             {showEffect && (
                 <View style={{ height: 80, marginBottom: 10 }}>

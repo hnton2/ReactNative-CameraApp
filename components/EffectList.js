@@ -124,7 +124,7 @@ function EffectList({ changeFilter, effectState, changeEffect }) {
                     onHidden={_onHidden}
                 />
             )}
-            {effect === "mixFactor" && (
+            {/* {effect === "mixFactor" && (
                 <FSlider
                     name="mixFactor"
                     value={effectState.mixFactor}
@@ -134,7 +134,7 @@ function EffectList({ changeFilter, effectState, changeEffect }) {
                     onReset={_onReset}
                     onHidden={_onHidden}
                 />
-            )}
+            )} */}
             {!effect && (
                 <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <View style={styles.box}>
@@ -182,11 +182,11 @@ function EffectList({ changeFilter, effectState, changeEffect }) {
                             <Text style={styles.textBox}>Blur</Text>
                         </TouchableOpacity>
                     </View>
-                    <View style={styles.box}>
+                    {/* <View style={styles.box}>
                         <TouchableOpacity onPress={() => handleEffect("mixFactor")}>
                             <Text style={styles.textBox}>MixFactor</Text>
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </ScrollView>
             )}
         </View>

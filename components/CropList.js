@@ -60,42 +60,6 @@ export default function CropList({ photo, toggleModal, changePhoto }) {
         base64: true,
     };
 
-    // useEffect(() => {
-    //     const onConvertImageToEditableSize = async () => {
-    //         const { convertedWidth, convertedheight } = onGetCorrectSizes(photo.width, photo.height);
-    //         const {
-    //             uri,
-    //             width: w,
-    //             height,
-    //         } = await ImageManipulator.manipulateAsync(
-    //             photo.uri,
-    //             [
-    //                 {
-    //                     resize: {
-    //                         width: convertedWidth,
-    //                         height: convertedheight,
-    //                     },
-    //                 },
-    //             ],
-    //             saveOptions
-    //         );
-    //         setPhotoUri(uri);
-    //         setActualSize({ width: w, height: height });
-    //     };
-    //     onConvertImageToEditableSize();
-    // }, []);
-
-    // const onGetCorrectSizes = (w, h) => {
-    //     const sizes = {
-    //         convertedWidth: w,
-    //         convertedheight: h,
-    //     };
-    //     const ratio = Math.min(1920 / w, 1080 / h);
-    //     sizes.convertedWidth = Math.round(w * ratio);
-    //     sizes.convertedheight = Math.round(h * ratio);
-    //     return sizes;
-    // };
-
     const onToggleModal = () => {
         toggleModal();
         setIsVisible(false);
@@ -306,8 +270,11 @@ export default function CropList({ photo, toggleModal, changePhoto }) {
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         onPress={() => {
-                                            // ChangePhoto
-                                            onPictureChoosed({ uri, base64 });
+                                            changePhoto({
+                                                uri: photoUri,
+                                                height: actualSize.height,
+                                                width: actualSize.width,
+                                            });
                                             toggleModal();
                                         }}
                                         style={{
@@ -344,7 +311,7 @@ export default function CropList({ photo, toggleModal, changePhoto }) {
             </SafeAreaView>
             <View style={{ flex: 1, backgroundColor: "black", width: Dimensions.get("window").width }}>
                 <ScrollView
-                    style={{ position: "relative", flex: 1 }}
+                    style={{ flex: 1 }}
                     contentContainerStyle={{ backgroundColor: "black" }}
                     maximumZoomScale={5}
                     minimumZoomScale={0.5}
@@ -363,7 +330,8 @@ export default function CropList({ photo, toggleModal, changePhoto }) {
                 >
                     <Image
                         source={{ uri: photoUri }}
-                        style={{ width: actualSize.width, height: actualSize.height, resizeMode: "contain" }}
+                        resizeMode="contain"
+                        style={{ width: actualSize.width, height: actualSize.height }}
                         onLayout={({ nativeEvent }) => getImageFrame(nativeEvent.layout)}
                     />
                     {cropMode && (
