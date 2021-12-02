@@ -39,7 +39,7 @@ function FSlider({ name, value, min, max, onChange, onReset, onHidden }) {
 
                 <View>
                     <Text style={styles.text1}>{name}</Text>
-                    {/* <Text style={styles.text1}>{Math.round(value * 100) / 100}</Text> */}
+                    <Text style={styles.text1}>{Math.round(value * 100) / 100}</Text>
                 </View>
                 {/* Button default effect */}
                 <TouchableOpacity onPress={handleOnReset}>

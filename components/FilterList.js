@@ -29,11 +29,11 @@ import Walden from "../filters/Walden";
 import XproII from "../filters/XproII";
 import FilterComponent from "./Filter";
 
-function FilterButton({ component, name, uri, changeFilter, factor = 1 }) {
+function FilterButton({ component, name, uri, changeFilter, factor = 1, ...props }) {
     return (
         <TouchableOpacity onPress={() => changeFilter(name)}>
             <Surface style={{ width: 80, height: 80 }}>
-                <FilterComponent component={component} photoUri={uri} factor={factor} />
+                <FilterComponent component={component} photoUri={uri} factor={factor} {...props} />
             </Surface>
             <Text style={{ color: "white", textAlign: "center", fontSize: 9 }}>{name}</Text>
         </TouchableOpacity>
@@ -102,7 +102,9 @@ function FilterList({ photo, changeFilter }) {
                 name={filterType.Sharpen}
                 uri={photo.uri}
                 changeFilter={changeFilter}
-                factor={0.25}
+                factor={1.25}
+                width={photo.width}
+                height={photo.height}
             />
             <FilterButton
                 component={Saturate}
@@ -116,7 +118,7 @@ function FilterList({ photo, changeFilter }) {
                 name={filterType.Sepia}
                 uri={photo.uri}
                 changeFilter={changeFilter}
-                factor={1.5}
+                factor={0.75}
             />
             {/* <TouchableOpacity>
                 <Surface style={{ height: 80, width: 80 }}>

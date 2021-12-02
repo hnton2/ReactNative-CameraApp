@@ -8,6 +8,7 @@ const defaultEffect = {
     temperature: 0,
     sharpen: 0,
     blur: 0,
+    flyeye: 0,
     mixFactor: 0,
 };
 

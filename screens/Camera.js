@@ -16,6 +16,7 @@ import { FaceDetectorLandmarks, FaceDetectorMode, FaceDetectorClassifications } 
 import Blur from "../filters/Blur";
 import Sharpen from "../filters/Sharpen";
 import Temperature from "../filters/Temperature";
+import { Flyeye } from "../filters/FlyEye";
 
 const shaders = Shaders.create({
     YFlip: {
@@ -71,6 +72,7 @@ export default function CameraScreen({ navigation }) {
         temperature: defaultEffect.temperature,
         sharpen: defaultEffect.sharpen,
         blur: defaultEffect.blur,
+        flyeye: defaultEffect.flyeye,
         mixFactor: defaultEffect.mixFactor,
     });
     const [raf, setRaf] = useState(null);
@@ -334,33 +336,35 @@ export default function CameraScreen({ navigation }) {
             <View style={{ flex: 1 }}>
                 <Surface ref={(ref) => (captureImage = ref)} style={styles.surface}>
                     <Instagram {...effect}>
-                        <Blur factor={effect.blur}>
-                            <Sharpen factor={effect.sharpen}>
-                                <Temperature factor={effect.temperature}>
-                                    <Node
-                                        blendFunc={{ src: "one", dst: "one minus src alpha" }}
-                                        shader={shaders.YFlip}
-                                        uniforms={{
-                                            t: () => camera,
-                                        }}
-                                    >
-                                        <Camera
-                                            ref={onCameraRef}
-                                            style={styles.camera}
-                                            type={type}
-                                            flashMode={flashMode}
-                                            autoFocus={autoFocus}
-                                            whiteBalance={whiteBalance}
-                                            onMountError={handleMountError}
-                                            onFacesDetected={faceDetecting ? handleOnFacesDetected : undefined}
-                                            faceDetectorSettings={{
-                                                tracking: true,
+                        <Flyeye factor={effect.flyeye}>
+                            <Blur factor={effect.blur}>
+                                <Sharpen factor={effect.sharpen}>
+                                    <Temperature factor={effect.temperature}>
+                                        <Node
+                                            blendFunc={{ src: "one", dst: "one minus src alpha" }}
+                                            shader={shaders.YFlip}
+                                            uniforms={{
+                                                t: () => camera,
                                             }}
-                                        />
-                                    </Node>
-                                </Temperature>
-                            </Sharpen>
-                        </Blur>
+                                        >
+                                            <Camera
+                                                ref={onCameraRef}
+                                                style={styles.camera}
+                                                type={type}
+                                                flashMode={flashMode}
+                                                autoFocus={autoFocus}
+                                                whiteBalance={whiteBalance}
+                                                onMountError={handleMountError}
+                                                onFacesDetected={faceDetecting ? handleOnFacesDetected : undefined}
+                                                faceDetectorSettings={{
+                                                    tracking: true,
+                                                }}
+                                            />
+                                        </Node>
+                                    </Temperature>
+                                </Sharpen>
+                            </Blur>
+                        </Flyeye>
                     </Instagram>
                 </Surface>
 

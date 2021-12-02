@@ -41,6 +41,8 @@ import Colorify from "../filters/ColorScale";
 
 import { saveImageToAlbum } from "../helpers/Library";
 import Blur from "../filters/Blur";
+import { Flyeye } from "../filters/FlyEye";
+import { Flip } from "../filters/Flip";
 
 const { width, height } = Dimensions.get("window");
 const FILTER = "FILTER",
@@ -109,6 +111,7 @@ function EditScreen({ route, navigation }) {
         temperature: defaultEffect.temperature,
         sharpen: defaultEffect.sharpen,
         blur: defaultEffect.blur,
+        flyeye: defaultEffect.flyeye,
         mixFactor: defaultEffect.mixFactor,
     });
 
@@ -186,23 +189,31 @@ function EditScreen({ route, navigation }) {
                             <FilterComponent component={Hue} factor={2} photoUri={photo.uri} />
                         )}
                         {filter === filterType.Negative && (
-                            <FilterComponent component={Negative} factor={0.25} photoUri={photo.uri} />
+                            <FilterComponent component={Negative} factor={0.125} photoUri={photo.uri} />
                         )}
                         {filter === filterType.Sharpen && (
-                            <FilterComponent component={Sharpen} factor={0.25} photoUri={photo.uri} />
+                            <FilterComponent
+                                component={Sharpen}
+                                factor={2.5}
+                                width={photo.width}
+                                height={photo.height}
+                                photoUri={photo.uri}
+                            />
                         )}
                         {filter === filterType.Saturate && (
                             <FilterComponent component={Saturate} factor={2} photoUri={photo.uri} />
                         )}
                         {filter === filterType.Sepia && (
-                            <FilterComponent component={Sepia} factor={1.5} photoUri={photo.uri} />
+                            <FilterComponent component={Sepia} factor={0.75} photoUri={photo.uri} />
                         )}
                         {filter === "effectMode" && (
                             <Instagram {...effect}>
                                 <Blur factor={effect.blur}>
-                                    <Sharpen factor={effect.sharpen} width={photo.width} height={photo.height}>
-                                        <Temperature factor={effect.temperature}>{{ uri: photo.uri }}</Temperature>
-                                    </Sharpen>
+                                    <Flyeye factor={effect.flyeye}>
+                                        <Sharpen factor={effect.sharpen} width={photo.width} height={photo.height}>
+                                            <Temperature factor={effect.temperature}>{{ uri: photo.uri }}</Temperature>
+                                        </Sharpen>
+                                    </Flyeye>
                                 </Blur>
                             </Instagram>
                         )}

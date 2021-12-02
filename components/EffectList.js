@@ -124,6 +124,17 @@ function EffectList({ changeFilter, effectState, changeEffect }) {
                     onHidden={_onHidden}
                 />
             )}
+            {effect === "flyeye" && (
+                <FSlider
+                    name="flyeye"
+                    value={effectState.flyeye}
+                    min={0}
+                    max={5}
+                    onChange={_onChange}
+                    onReset={_onReset}
+                    onHidden={_onHidden}
+                />
+            )}
             {/* {effect === "mixFactor" && (
                 <FSlider
                     name="mixFactor"
@@ -180,6 +191,11 @@ function EffectList({ changeFilter, effectState, changeEffect }) {
                     <View style={styles.box}>
                         <TouchableOpacity onPress={() => handleEffect("blur")}>
                             <Text style={styles.textBox}>Blur</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.box}>
+                        <TouchableOpacity onPress={() => handleEffect("flyeye")}>
+                            <Text style={styles.textBox}>FlyEye</Text>
                         </TouchableOpacity>
                     </View>
                     {/* <View style={styles.box}>
